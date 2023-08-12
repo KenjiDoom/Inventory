@@ -1,4 +1,15 @@
-import sqlite3
+import sqlite3, os
+
+def check_database_existence():
+    if os.path.isfile('Inven-database.db'):
+        with sqlite3.connect('Inven-database.db') as connection:
+            print('Displaying database information')
+            cursor = connection.cursor()
+            cursor.execute('SELECT * FROM inventory')
+            rows = cursor.fetchall()
+            print(rows)
+    else:
+        database_creation()
 
 def database_creation():
     print('Generating database...')
@@ -18,4 +29,4 @@ def database_creation():
         
         connection.commit()
 
-database_creation()
+check_database_existence()
