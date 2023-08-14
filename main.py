@@ -1,4 +1,4 @@
-import sqlite3, os
+import sqlite3, os, uuid, qrcode
 
 def database_creation():
     # Checking for stockroom database file [ This represents the stockroom ]
@@ -28,6 +28,8 @@ def database_creation():
     # Checking for the sales floor database file. [ This represents the sales floor ]
     if os.path.isfile('sales_floor_database.db'):
         with sqlite3.connect('sales_floor_database.db') as connection:
+            # Generate qr codes for 
+            generate_qr_codes_for_database('sales_floor_database.db')
             cursor = connection.cursor()
             cursor.execute('SELECT * FROM sales_inventory')
             rows = cursor.fetchall()
@@ -35,15 +37,24 @@ def database_creation():
             print(rows)
     else:
         # Should make an empty database
-        with sqlite3.connect('stockroom-database.db') as connection:
+        with sqlite3.connect('sales_floor_database.db') as connection:
+            generate_qr_codes_for_database('sales_floor_database.db')
             cursor = connection.cursor()
-            cursor.execute("create table sales_inventory(SKU integer, DESCRIPTION text, PRICE integer)")
-            connection.commit()
+            try:
+                cursor.execute("create table sales_inventory(SKU integer, DESCRIPTION text, PRICE integer)")
+                connection.commit()
             
-            cursor.execute("SELECT * FROM sales_inventory")
-            rows = cursor.fetchall()
-            
+                cursor.execute("SELECT * FROM sales_inventory")
+                rows = cursor.fetchall()
+            except sqlite3.OperationalError:
+                pass
             print(rows)
             connection.commit()
 
+def generate_random_uuid():
+    return uuid.uuid4().hex
+
+def generate_qr_codes_for_database(table_name):
+    img = qrcode.make(table_name)
+    img.save(table_name + '.png')
 database_creation()
