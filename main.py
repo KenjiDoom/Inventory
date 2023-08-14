@@ -12,6 +12,7 @@ def database_creation():
     else:
         with sqlite3.connect('stockroom-database.db') as connection:
             cursor = connection.cursor()
+            generate_qr_codes_for_database('stockroom-database.db')
             cursor.execute("create table inventory(SKU integer, DESCRIPTION text, PRICE integer)")
             data = [
                 (10034, 'Gaming key binds', 10)
@@ -52,9 +53,23 @@ def database_creation():
             connection.commit()
 
 def generate_random_uuid():
+    # This is used for idetenifying, product, totes and stockroom inventory.
     return uuid.uuid4().hex
 
 def generate_qr_codes_for_database(table_name):
     img = qrcode.make(table_name)
-    img.save(table_name + '.png')
-database_creation()
+    img.save(table_name.replace('.db', '') + '.png')
+
+def create_new_table(database_name):
+    try:
+        with sqlite3.connect(database_name) as connection:
+            cursor = connection.cursor()
+            cursor.execute("create table tote(SKU integer, DESCRIPTION text, PRICE integer)")
+            connection.commit()
+    except sqlite3.OperationalError:
+        print('tote already exist...')
+
+def move_data_to_new_table(databasename):
+    pass
+    
+create_new_table('stockroom-database.db')
