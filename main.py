@@ -70,6 +70,9 @@ def create_new_table(database_name):
         print('tote already exist...')
 
 def move_data_to_new_table(databasename):
-    pass
-    
-create_new_table('stockroom-database.db')
+    with sqlite3.connect(databasename) as connection:
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO tote SELECT * from inventory")
+        connection.commit()
+
+move_data_to_new_table('stockroom-database.db')
