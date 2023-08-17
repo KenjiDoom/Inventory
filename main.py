@@ -69,10 +69,15 @@ def create_new_table(database_name):
     except sqlite3.OperationalError:
         print('tote already exist...')
 
-def move_data_to_new_table(databasename):
-    with sqlite3.connect(databasename) as connection:
+def create_qr_items():
+    with sqlite3.connect('stockroom-database.db') as connection:    
         cursor = connection.cursor()
-        cursor.execute("INSERT INTO tote SELECT * from inventory")
-        connection.commit()
+        data = cursor.execute("SELECT name FROM sqlite_schema")
+        for table_name in cursor:
+            database_retriveal = cursor.execute("PRAGMA database_list;")
+            database_name = database_retriveal.fetchall()
+            print(str(table_name[0]))
+            img = qrcode.make(table_name[0] + ' ' +  database_name[0][2])
+            img.save(str(table_name[0]) + '.png')
 
 move_data_to_new_table('stockroom-database.db')
