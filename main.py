@@ -69,15 +69,15 @@ def create_new_table(database_name):
     except sqlite3.OperationalError:
         print('tote already exist...')
 
-def create_qr_items():
-    with sqlite3.connect('stockroom-database.db') as connection:    
-        cursor = connection.cursor()
-        data = cursor.execute("SELECT name FROM sqlite_schema")
-        for table_name in cursor:
-            database_retriveal = cursor.execute("PRAGMA database_list;")
-            database_name = database_retriveal.fetchall()
-            print(str(table_name[0]))
-            img = qrcode.make(table_name[0] + ' ' +  database_name[0][2])
-            img.save(str(table_name[0]) + '.png')
+def show_scan_results(table_name, database_file_name):
+    with sqlite3.connect(database_file_name) as connection:
+        try:
+            cursor = connection.cursor()
+            all_data = cursor.execute(f"SELECT * from {table_name}")
+            print(all_data.fetchall())
+        except sqlite3.OperationalError:
+            print('Table was not found...')
 
-move_data_to_new_table('stockroom-database.db')
+data = input('enter qr code: ')
+list_1 = data.split(" ")
+show_scan_results(list_1[0], list_1[1])
