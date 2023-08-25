@@ -91,21 +91,28 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
         # grep thru all databases until the unique code is found.
         for database in os.listdir():
             if database.endswith('.db'):
+                
                 with sqlite3.connect(database) as connection:
                     cursor = connection.cursor()
                     table_names = cursor.execute("""select name from sqlite_master where type='table';""")
                     results = table_names.fetchall()
+                    
                     for table in results:
                         table_name = table[0]
-                        print(database +  ' '  + table_name + ' ' + str(unique_code))
+                        #print(database +  ' '  + table_name + ' ' + str(unique_code))
+                        
                         with sqlite3.connect(database) as connection:
                             cursor = connection.cursor()
                             data = cursor.execute(f"""select {unique_code} from {table_name}""")
-                            print(data.fetchall())
-                    
+                            data = data.fetchone()
+                            if data == None:
+                                pass
+                            elif data != None:
+                                print('Data has been found...')
+                                print(database +  ' '  + table_name + ' ' + str(unique_code))
 
-sku_tag_data = show_scan_results_for_item(unique_code=40456)
-print(sku_tag_data)
+
+show_scan_results_for_item(unique_code=40456)
 
 # Creating a whole new database and hard coding the data
 #database_creation('testing_database.db')
