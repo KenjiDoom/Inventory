@@ -24,7 +24,6 @@ def database_creation(database_name):
             print(rows)
             connection.commit()
     
-    # This database does need to be hard coded.
     if os.path.isfile('product_information_database.db'):
         pass
     elif os.path.isfile('product_information_database.db') == False:
@@ -51,11 +50,13 @@ def generate_random_uuid():
     return uuid.uuid4().hex
 
 def generate_qr_codes_for_database(databasename):
+    # This needs to contain the table name and database file name
     img = qrcode.make(databasename)
     img.save(databasename.replace('.db', '') + '.png')
 
-def generate_qr_codes_for_sku(sku, unique_name):
-    print()
+def generate_qr_codes_for_sku(sku, table_name, database_file_name):
+    # !!!! Unique value will also be added once implemented !!!!
+    pass
 
 def create_new_item_group(database_file_name, table_name):
     # This function is used for creating a new item group. AKA: creating a new table within a database.
@@ -69,41 +70,47 @@ def create_new_item_group(database_file_name, table_name):
     except sqlite3.OperationalError:
         print(f'"{table_name}" already exist...')
 
-def show_scan_results_for_item(table_name=None, database_file_name=None, sku=None):
+def show_scan_results_for_item(table_name=None, database_file_name=None, sku=None, unique_code=None):
     # Show what's inside a database or get information about a product
-    # I foresee this code having some bugs that we'll need to debug...
-    if database_file_name != None:
-        # This gets all items within a database
+    if database_file_name and table_name != None:
         with sqlite3.connect(database_file_name) as connection:
             try:
+                print(f'Displaying all items within this database {database_file_name}')
                 cursor = connection.cursor()
                 all_data = cursor.execute(f"SELECT * from {table_name}")
                 print(all_data.fetchall())
             except sqlite3.OperationalError:
-                if table_name == None:
-                    print('This file does not contain any databases')
-                elif table_name != None:
-                    print(f'{table_name} was not found...')
+                print('Nothing was found')
     elif sku != None:
-        # This gets product information
-        # !!!! Once you print out QR tags for skus, then implement this code... !!!!
+        # Used for grabbing nformation on a product.
         with sqlite3.connect('product_information_database.db') as connection:
-            try:
-                cursor = connection.cursor()
-                # How can I also print out the description of this sku (product)
-                sku_data = cursor.execute(f"SELECT {sku}, DESCRIPTION, PRICE from product_info")
-                return sku_data.fetchone()
-            except sqlite3.OperationalError:
-                print('Oops something went wrong')
+            cursor = connection.cursor()
+            sku_data = cursor.execute(f"SELECT {sku}, DESCRIPTION, PRICE from product_info")
+            return sku_data.fetchone()
+    elif unique_code != None:
+        # grep thru all databases until the unique code is found.
+        for database in os.listdir():
+            if database.endswith('.db'):
+                with sqlite3.connect(database) as connection:
+                    cursor = connection.cursor()
+                    table_names = cursor.execute("""select name from sqlite_master where type='table';""")
+                    results = table_names.fetchall()
+                    for table in results:
+                        table_name = table[0]
+                        print(database +  ' '  + table_name + ' ' + str(unique_code))
+                        with sqlite3.connect(database) as connection:
+                            cursor = connection.cursor()
+                            data = cursor.execute(f"""select {unique_code} from {table_name}""")
+                            print(data.fetchall())
+                    
 
-sku_tag_data = show_scan_results_for_item(sku=40456)
-generate_qr_codes_for_sku(sku=sku_tag_data[0], descritpion=sku_tag_data[1], price=sku_tag_data[2])
-
+sku_tag_data = show_scan_results_for_item(unique_code=40456)
+print(sku_tag_data)
 
 # Creating a whole new database and hard coding the data
 #database_creation('testing_database.db')
 
-# Code for running show_scan_results_for_item()
+#Code for running show_scan_results_for_item()
 # data = input('enter qr code: ')
 # list_1 = data.split(" ")
 # print(list_1[0])
