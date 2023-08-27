@@ -32,9 +32,9 @@ def database_creation(database_name):
             generate_qr_codes_for_database('product_information_database.db')
             cursor.execute("create table product_info(SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer)")
             data = [
-                (10034, 'Gaming key binds', 10, 00000),
-                (40456, 'Mousepad', 5, 00000),
-                (68896, 'Headset', 15, 00000),
+                (10034, 'Gaming key binds', 10, 3236630686),
+                (40456, 'Mousepad', 5, 2761298854),
+                (68896, 'Headset', 15, 5609943232),
             ]
             cursor.executemany('INSERT INTO product_info VALUES(?,?,?,?)', data)
             connection.commit()
@@ -47,16 +47,17 @@ def database_creation(database_name):
 
 def generate_random_uuid():
     # This is used for identifying, product, totes and stockroom inventory.
-    return uuid.uuid4().hex
+    data = str(uuid.uuid4().int)
+    return data[0:10]
 
 def generate_qr_codes_for_database(databasename):
     # This needs to contain the table name and database file name
     img = qrcode.make(databasename)
     img.save(databasename.replace('.db', '') + '.png')
 
-def generate_qr_codes_for_sku(sku, table_name, database_file_name):
+def generate_qr_codes_for_sku(sku, table_name, database_file_name, unique_code):
     # !!!! Unique value will also be added once implemented !!!!
-    img = qrcode.make(str(sku) + ' ' + table_name + ' ' + database_file_name)
+    img = qrcode.make(str(sku) + ' ' + table_name + ' ' + database_file_name + ' ' + unique_code)
     img.save(str(sku) + '.png')
 
 def create_new_item_group(database_file_name, table_name):
@@ -92,16 +93,12 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
         # grep thru all databases until the unique code is found.
         for database in os.listdir():
             if database.endswith('.db'):
-                
                 with sqlite3.connect(database) as connection:
                     cursor = connection.cursor()
                     table_names = cursor.execute("""select name from sqlite_master where type='table';""")
                     results = table_names.fetchall()
-                    
                     for table in results:
                         table_name = table[0]
-                        #print(database +  ' '  + table_name + ' ' + str(unique_code))
-                        
                         with sqlite3.connect(database) as connection:
                             cursor = connection.cursor()
                             data = cursor.execute(f"""select {unique_code} from {table_name}""")
@@ -114,10 +111,9 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                                 return unique_code, table_name, database
                                 # now this data will be returned into a qr tag for a item
 
-
-database_creation('test')
-
-#data = show_scan_results_for_item(unique_code=40456)
+#database_creation('test')
+data = show_scan_results_for_item(unique_code=3236630686)
+print(data)
 #generate_qr_codes_for_sku(data[0], data[1], data[2])
 
 # Creating a whole new database and hard coding the data
