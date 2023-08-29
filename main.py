@@ -75,7 +75,7 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
             except sqlite3.OperationalError:
                 print('Nothing was found')
     elif sku != None:
-        # Used for grabbing nformation on a product.
+        # Used for grabbing information on a product.
         with sqlite3.connect('product_information_database.db') as connection:
             cursor = connection.cursor()
             sku_data = cursor.execute(f"SELECT {sku}, DESCRIPTION, PRICE from product_info")
@@ -99,11 +99,25 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                             elif data != None:
                                 return unique_code, table_name, database, data[1]
 
+def move_data_around(unique_code=None, destination_file_name=None, destination_table_name=None):
+    # Unique code will be used to fetch item information
+    # Shoud we ask for the user input within the function?
+    data = show_scan_results_for_item(unique_code=unique_code)
+    print(data)
+    print(destination_file_name)
+    print(destination_table_name)
+
+# Move data around,
+user_qr_scan_data = input('Scan the qr tag: ')
+value = user_qr_scan_data.find(' ')
+move_data_around(unique_code=3236630686, destination_file_name=user_qr_scan_data[0:value] + '.db', destination_table_name=user_qr_scan_data[value:].replace(' ', ''))
+
+
 # Creating a new database
 #database_creation('Testing_database')
 
-data = show_scan_results_for_item(unique_code=3236630686)
-generate_qr_codes_for_sku(sku=data[3], table_name=data[1], database_file_name=data[2], unique_code=data[0])
+#data = show_scan_results_for_item(unique_code=3236630686)
+#generate_qr_codes_for_sku(sku=data[3], table_name=data[1], database_file_name=data[2], unique_code=data[0])
 
 
 #Code for running show_scan_results_for_item()
