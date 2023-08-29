@@ -99,19 +99,42 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                             elif data != None:
                                 return unique_code, table_name, database, data[1]
 
-def move_data_around(unique_code=None, destination_file_name=None, destination_table_name=None):
+def move_data_around(unique_code=None, destination_filename=None, destination_table_name=None):
     # Unique code will be used to fetch item information
     # Shoud we ask for the user input within the function?
     data = show_scan_results_for_item(unique_code=unique_code)
-    print(data)
-    print(destination_file_name)
-    print(destination_table_name)
+    
+    source_database_file = data[2]
+    source_table_name = data[1]
+    
+    print('--------')
+    print(source_database_file)
+    print(destination_filename)
+
+    source_connection = sqlite3.connect(source_database_file)
+    destination_connection = sqlite3.connect(destination_filename)
+
+    source_cursor = source_connection.cursor()
+    destination_cursor = destination_connection.cursor()
+
+    source_cursor.execute(f"ATTACH DATABASE {source_database_file} AS source_db")
+
+    # Source and destination table names
+    # print(source_table_name)
+    # print(destination_table_name)
+    destination_cursor.execute(f"INSERT INTO {destination_table_name} SELECT {unique_code} FROM source.db.{source_table_name}")
+    destination_connection.commit()
+
+    source_cursor.execute("DETACH DATABASE source_db")
+    
+    source_connection.close()
+    destination_connection.close()
 
 # Move data around,
 user_qr_scan_data = input('Scan the qr tag: ')
 value = user_qr_scan_data.find(' ')
-move_data_around(unique_code=3236630686, destination_file_name=user_qr_scan_data[0:value] + '.db', destination_table_name=user_qr_scan_data[value:].replace(' ', ''))
-
+move_data_around(unique_code=3236630686, destination_filename=user_qr_scan_data[0:value] + '.db', destination_table_name=user_qr_scan_data[value:].replace(' ', ''))
+#move_data_around(unique_code=3236630686)
 
 # Creating a new database
 #database_creation('Testing_database')
