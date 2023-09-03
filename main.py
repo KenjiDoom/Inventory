@@ -74,12 +74,14 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                 print(all_data.fetchall())
             except sqlite3.OperationalError:
                 print('Nothing was found')
+    
     elif sku != None:
         # Used for grabbing information on a product.
         with sqlite3.connect('product_information_database.db') as connection:
             cursor = connection.cursor()
             sku_data = cursor.execute(f"SELECT {sku}, DESCRIPTION, PRICE from product_info")
             return sku_data.fetchone()
+    
     elif unique_code != None:
         # Look through all the databases within a directory for a specific item.
         for database in os.listdir():
@@ -97,31 +99,36 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                             if data == None:
                                 pass
                             elif data != None:
-                                return unique_code, table_name, database, data[1]
+                                return data[1], data[2], data[0], unique_code, table_name, database
 
-def copy_item_to_inventory_database(unique_code=None, destination_filename=None, destination_table_name=None):
-    # This data is being copied into the database the user scans
-    # This is all item data
-    sku_data = show_scan_results_for_item(sku=None, unique_code=unique_code)
-    source_database_file = sku_data[2]
-    source_table_name = sku_data[1]
+def copy_item_to_inventory_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
+    # Copy item into a database
+    sku_data = show_scan_results_for_item(unique_code=unique_code)
+    # The data is still flipped.
     print(sku_data)
-
-    print(destination_filename)
+    # To-Fix: Creation of a NONE database when destination_filename equals None
+    # To-do: Exception handling when a user enter's an item instead of a inventory location.
     
-    # It's creating a database even if its none
     if destination_filename == None:
         pass
     elif destination_filename != None:
-        with sqlite3.connect(str(destination_filename)) as connection:
-            cursor = connection.cursor()
-            cursor.execute(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", sku_data)
-            connection.commit()
+        struct_data = [
+            (sku_data[0], sku_data[1], sku_data[2], unique_code)
+        ]
+        try:
+            with sqlite3.connect(str(destination_filename)) as connection:
+                cursor = connection.cursor()
+                cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
+                connection.commit()
+        except sqlite3.OperationalError as e:
+            print('Not an inventory database!!')
 
 
-database_to_scan = input('Scan the qr tag: ')
+item_to_scan = input("Scan the product qr code: ")
+database_to_scan = input('Scan the inventory qr tag: ')
 value = database_to_scan.find(' ')
-copy_item_to_inventory_database(unique_code=3236630686, destination_filename=database_to_scan[0:value] + '.db', destination_table_name=database_to_scan[value:].replace(' ', ''))
+print(item_to_scan)
+copy_item_to_inventory_database(unique_code=item_to_scan[3], sku=item_to_scan[0], destination_filename=database_to_scan[0:value] + '.db', destination_table_name=database_to_scan[value:].replace(' ', ''))
 
 # Creating a new database
 #database_creation('Testing_database')
