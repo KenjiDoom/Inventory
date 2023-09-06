@@ -94,25 +94,23 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                         table_name = table[0]
                         with sqlite3.connect(database) as connection:
                             cursor = connection.cursor()
-                            data = cursor.execute(f"""select {unique_code}, sku from {table_name}""")
+                            data = cursor.execute(f"""select {unique_code}, sku, description, price from {table_name} WHERE UNIQUE_CODE={unique_code}""")
                             data = data.fetchone()
                             if data == None:
                                 pass
                             elif data != None:
-                                # This is now broken for our generate_qr_codes_for_sku() function....
-                                return data[1], data[2], data[0], data[3], table_name, database
+                                return data[1], data[2], data[3], data[0], table_name, database
 
 def copy_item_to_inventory_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
-    # Copy item into a database
+    # Copy an item into a database
     sku_data = show_scan_results_for_item(unique_code=unique_code)
     # To-Fix: Creation of a NONE database when destination_filename equals None
     # To-do: Exception handling when a user enter's an item instead of a inventory location.
-    
     if destination_filename == None:
         pass
     elif destination_filename != None:
         struct_data = [
-            (sku_data[0], sku_data[1], sku_data[3], unique_code)
+            (sku_data[0], sku_data[1], sku_data[2], unique_code)
         ]
         try:
             with sqlite3.connect(str(destination_filename)) as connection:
@@ -123,17 +121,18 @@ def copy_item_to_inventory_database(unique_code=None, sku=None, destination_file
             print('Not an inventory database!!')
 
 
-# item_to_scan = input("Scan the product qr code: ")
-# database_to_scan = input('Scan the inventory qr tag: ')
-# value = database_to_scan.find(' ')
-# copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0], destination_filename=database_to_scan[0:value] + '.db', destination_table_name=database_to_scan[value:].replace(' ', ''))
+item_to_scan = input("Scan the product qr code: ")
+database_to_scan = input('Scan the inventory qr tag: ')
+value = database_to_scan.find(' ')
+copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0], destination_filename=database_to_scan[0:value] + '.db', destination_table_name=database_to_scan[value:].replace(' ', ''))
 
-# Create database files
+# code for creating database files
 #database_creation('Testing_database')
 
-data = show_scan_results_for_item(unique_code=3236630686)
-print(data)
-generate_qr_codes_for_sku(sku=data[3], table_name=data[1], database_file_name=data[2], unique_code=data[0])
+
+# code for creating qr codes for items
+# data = show_scan_results_for_item(unique_code=5609943232)
+# generate_qr_codes_for_sku(sku=data[0], table_name=data[4], database_file_name=data[5], unique_code=data[3])
 
 
 #Code for running show_scan_results_for_item()
