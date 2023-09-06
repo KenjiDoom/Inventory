@@ -102,13 +102,12 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                                 elif data != None:
                                     return data[1], data[2], data[3], data[0], table_name, database
         except sqlite3.OperationalError:
-            print('You must have scanned an inventory qr tag instead of a item...')
+            print('!! Error must have scanned an inventory qr tag instead of a item. !!')
 
 def copy_item_to_inventory_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
-    # Copy an item into a database
-    sku_data = show_scan_results_for_item(unique_code=unique_code)
+    # Copy an item into a databas
     # To-Fix: Creation of a NONE database when destination_filename equals None
-    # To-do: Exception handling when a user enter's an item instead of a inventory location.
+    sku_data = show_scan_results_for_item(unique_code=unique_code)
     if destination_filename == None:
         pass
     elif destination_filename != None:
@@ -121,16 +120,20 @@ def copy_item_to_inventory_database(unique_code=None, sku=None, destination_file
                 cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
                 connection.commit()
         except sqlite3.OperationalError as e:
-            print('Not an inventory database!!')
+            # When this happens a new database is created because of the lack of a real database.
+            print('!! Error scanned an item into an item. !!')
         except TypeError:
-            print('You must have scanned an inventory qr tag instead of a item...')
+            print('!! Error must have scanned an inventory QR tag instead of a item. !!')
+        except IndexError:
+            print('!! Error nothing was scanned. !!')
 
-
-item_to_scan = input("Scan the product qr code: ")
-database_to_scan = input('Scan the inventory qr tag: ')
-value = database_to_scan.find(' ')
-copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0], destination_filename=database_to_scan[0:value] + '.db', destination_table_name=database_to_scan[value:].replace(' ', ''))
-
+try:
+    item_to_scan = input("Scan the product qr code: ")
+    database_to_scan = input('Scan the inventory qr tag: ')
+    value = database_to_scan.find(' ')
+    copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0], destination_filename=database_to_scan[0:value] + '.db', destination_table_name=database_to_scan[value:].replace(' ', ''))
+except IndexError:
+    print('!! Error nothing was scanned. !!')
 # code for creating database files
 #database_creation('Testing_database')
 
