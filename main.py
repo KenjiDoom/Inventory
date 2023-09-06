@@ -84,22 +84,25 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
     
     elif unique_code != None:
         # Look through all the databases within a directory for a specific item.
-        for database in os.listdir():
-            if database.endswith('.db'):
-                with sqlite3.connect(database) as connection:
-                    cursor = connection.cursor()
-                    table_names = cursor.execute("""select name from sqlite_master where type='table';""")
-                    results = table_names.fetchall()
-                    for table in results:
-                        table_name = table[0]
-                        with sqlite3.connect(database) as connection:
-                            cursor = connection.cursor()
-                            data = cursor.execute(f"""select {unique_code}, sku, description, price from {table_name} WHERE UNIQUE_CODE={unique_code}""")
-                            data = data.fetchone()
-                            if data == None:
-                                pass
-                            elif data != None:
-                                return data[1], data[2], data[3], data[0], table_name, database
+        try:
+            for database in os.listdir():
+                if database.endswith('.db'):
+                    with sqlite3.connect(database) as connection:
+                        cursor = connection.cursor()
+                        table_names = cursor.execute("""select name from sqlite_master where type='table';""")
+                        results = table_names.fetchall()
+                        for table in results:
+                            table_name = table[0]
+                            with sqlite3.connect(database) as connection:
+                                cursor = connection.cursor()
+                                data = cursor.execute(f"""select {unique_code}, sku, description, price from {table_name} WHERE UNIQUE_CODE={unique_code}""")
+                                data = data.fetchone()
+                                if data == None:
+                                    pass
+                                elif data != None:
+                                    return data[1], data[2], data[3], data[0], table_name, database
+        except sqlite3.OperationalError:
+            print('You must have scanned an inventory qr tag instead of a item...')
 
 def copy_item_to_inventory_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
     # Copy an item into a database
@@ -109,16 +112,18 @@ def copy_item_to_inventory_database(unique_code=None, sku=None, destination_file
     if destination_filename == None:
         pass
     elif destination_filename != None:
-        struct_data = [
-            (sku_data[0], sku_data[1], sku_data[2], unique_code)
-        ]
         try:
+            struct_data = [
+                (sku_data[0], sku_data[1], sku_data[2], unique_code)
+            ]
             with sqlite3.connect(str(destination_filename)) as connection:
                 cursor = connection.cursor()
                 cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
                 connection.commit()
         except sqlite3.OperationalError as e:
             print('Not an inventory database!!')
+        except TypeError:
+            print('You must have scanned an inventory qr tag instead of a item...')
 
 
 item_to_scan = input("Scan the product qr code: ")
