@@ -9,12 +9,15 @@ def database_creation(database_name):
             print('File found...')
             print(rows)
     else:
-        with sqlite3.connect(database_name + '.db') as connection:
-            cursor = connection.cursor()
-            table_name = database_name.replace('.db', '') + '_inventory'
-            generate_qr_codes_for_database(database_name, table_name)
-            cursor.execute(f"create table {table_name}(SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer)")
-            connection.commit()
+        try:
+            with sqlite3.connect(database_name + '.db') as connection:
+                cursor = connection.cursor()
+                table_name = database_name.replace('.db', '') + '_inventory'
+                generate_qr_codes_for_database(database_name + '.db', table_name)
+                cursor.execute(f"create table {table_name}(SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer)")
+                connection.commit()
+        except sqlite3.OperationalError:
+            print('That file already exist...')
     
     if os.path.isfile('product_information_database.db'):
         pass
@@ -111,32 +114,36 @@ def copy_item_to_inventory_database(unique_code=None, sku=None, destination_file
     if destination_filename == None:
         pass
     elif destination_filename != None:
-        try:
-            struct_data = [
-                (sku_data[0], sku_data[1], sku_data[2], unique_code)
-            ]
-            with sqlite3.connect(str(destination_filename)) as connection:
-                cursor = connection.cursor()
-                cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
-                connection.commit()
-        except sqlite3.OperationalError as e:
-            # When this happens a new database is created because of the lack of a real database.
-            print('!! Error scanned an item into an item. !!')
-        except TypeError:
-            print('!! Error must have scanned an inventory QR tag instead of a item. !!')
-        except IndexError:
-            print('!! Error nothing was scanned. !!')
+        if os.path.exists(destination_filename) == True:
+            try:
+                struct_data = [
+                    (sku_data[0], sku_data[1], sku_data[2], unique_code)
+                ]
+                # This is what's causing the new creation of database
+                with sqlite3.connect(str(destination_filename)) as connection:
+                    cursor = connection.cursor()
+                    cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
+                    connection.commit()
+            except sqlite3.OperationalError as e:               
+                print('!! Error scanned an item into an item. !!')
+            except TypeError:
+                print('!! Error must have scanned an inventory QR tag instead of a item. !!')
+            except IndexError:
+                print('!! Error nothing was scanned. !!')
+        else:
+            print(destination_filename + ' does not exist...')
+            pass
 
 try:
     item_to_scan = input("Scan the product qr code: ")
     database_to_scan = input('Scan the inventory qr tag: ')
     value = database_to_scan.find(' ')
-    copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0], destination_filename=database_to_scan[0:value] + '.db', destination_table_name=database_to_scan[value:].replace(' ', ''))
+    copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0], destination_filename=database_to_scan[0:value], destination_table_name=database_to_scan[value:].replace(' ', ''))
 except IndexError:
     print('!! Error nothing was scanned. !!')
-# code for creating database files
-#database_creation('Testing_database')
 
+#code for creating database files
+# database_creation('New_testing_database')
 
 # code for creating qr codes for items
 # data = show_scan_results_for_item(unique_code=5609943232)
