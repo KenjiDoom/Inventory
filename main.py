@@ -134,6 +134,14 @@ def copy_item_to_inventory_database(unique_code=None, sku=None, destination_file
             print(destination_filename + ' does not exist...')
             pass
 
+def delete_items_from_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
+    with sqlite3.connect(destination_filename) as connection:
+        cursor = connection.cursor()
+        cursor.execute(f"""DELETE from {destination_table_name} where unique_code={unique_code}""")
+        connection.commit()
+
+
+# Code for copying items into a database
 try:
     item_to_scan = input("Scan the product qr code: ")
     database_to_scan = input('Scan the inventory qr tag: ')
