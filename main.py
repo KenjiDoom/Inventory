@@ -40,6 +40,9 @@ def database_creation(database_name):
             print(rows)
             connection.commit()
 
+def update_all_qr_tags():
+    pass
+
 def generate_random_uuid():
     # This is used for identifying, product, totes and stockroom inventory.
     data = str(uuid.uuid4().int)
@@ -110,60 +113,77 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
             print('!! Error must have scanned an inventory qr tag instead of a item. !!')
 
 def copy_item_to_inventory_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
-    # Copy an item into a databas
+    # Copy an item into a database
     # To-Fix: Creation of a NONE database when destination_filename equals None
     sku_data = show_scan_results_for_item(unique_code=unique_code)
-    if destination_filename == None:
-        pass
-    elif destination_filename != None:
-        if os.path.exists(destination_filename) == True:
-            try:
-                struct_data = [
-                    (sku_data[0], sku_data[1], sku_data[2], unique_code)
-                ]
-                # This is what's causing the new creation of database
-                with sqlite3.connect(str(destination_filename)) as connection:
-                    cursor = connection.cursor()
-                    cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
-                    connection.commit()
-            except sqlite3.OperationalError as e:               
-                print('!! Error scanned an item into an item. !!')
-            except TypeError:
-                print('!! Error must have scanned an inventory QR tag instead of a item. !!')
-            except IndexError:
-                print('!! Error nothing was scanned. !!')
+    try:
+        if sku_data[0] != None:
+            if destination_filename == None:
+                pass
+            elif destination_filename != None:
+                if os.path.exists(destination_filename) == True:
+                    try:
+                        struct_data = [
+                            (sku_data[0], sku_data[1], sku_data[2], unique_code)
+                        ]
+                        with sqlite3.connect(str(destination_filename)) as connection:
+                            cursor = connection.cursor()
+                            cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
+                            connection.commit()
+                            # Delete data once it's been copied into the new database.
+                            delete_items_from_database(unique_code=unique_code, new_destination_filename=str(destination_filename), new_destination_table_name=str(destination_table_name))
+                    except sqlite3.OperationalError as e:  
+                        print('Error scanned an item into an item.')
+                        print(e)
+                    except IndexError:
+                        print('!! Error nothing was scanned. !!')
+                else:
+                    print(destination_filename + ' not found...')
         else:
-            print(destination_filename + ' does not exist...')
             pass
+    except TypeError:
+        print('Item not found...')
 
-def delete_items_from_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
-    # When is this function being ran? before or after? 
-    # Delete an item from a file (database)
-    with sqlite3.connect(destination_filename) as connection:
-        cursor = connection.cursor()
-        cursor.execute(f"""DELETE from {destination_table_name} where unique_code={unique_code}""")
-        connection.commit()
+def delete_items_from_database(unique_code=None, new_destination_filename=None, new_destination_table_name=None):
+    # Delete an item from a database
+    try:
+        item_location_information = show_scan_results_for_item(unique_code=unique_code)  
+        
+        file_data = [
+            item_location_information[5], item_location_information[4], new_destination_filename, new_destination_table_name
+        ]
+        print(file_data[0])
+        with sqlite3.connect(str(file_data[0])) as connection:
+            cursor = connection.cursor()
+            cursor.execute(f"""DELETE from {file_data[1]} where unique_code={unique_code}""")
+            print('Deleted.....')
+            connection.commit()
+    
+    except NameError:
+        print('The item is already deleted.')
+    except TypeError:
+        print('The item is already deleted.')
 
-item_to_scan = input("Scan the product qr code you want to delete")
+# item_to_scan = input("Scan the product qr code you want to delete: ")
+# delete_items_from_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0])
 
 # Code for copying items into a database
-# try:
-#     item_to_scan = input("Scan the product qr code: ")
-#     database_to_scan = input('Scan the inventory qr tag: ')
-#     value = database_to_scan.find(' ')
-#     copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0], destination_filename=database_to_scan[0:value], destination_table_name=database_to_scan[value:].replace(' ', ''))
-# except IndexError:
-#     print('!! Error nothing was scanned. !!')
+try:
+    item_to_scan = input("Scan the product qr code: ")
+    database_to_scan = input('Scan the inventory qr tag: ')
+    value = database_to_scan.find(' ')
+    copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0:5], destination_filename=database_to_scan[0:value], destination_table_name=database_to_scan[value:].replace(' ', ''))
+except IndexError:
+    print('!! Error nothing was scanned. !!')
 
-#code for creating database files
-# database_creation('New_testing_database')
+# Code for creating database files
+#database_creation('BRANDNEWDATABASE')
 
-# code for creating qr codes for items
+# Code for creating qr codes for items
 #data = show_scan_results_for_item(unique_code=5609943232)
-# generate_qr_codes_for_sku(sku=data[0], table_name=data[4], database_file_name=data[5], unique_code=data[3])
+#generate_qr_codes_for_sku(sku=data[0], table_name=data[4], database_file_name=data[5], unique_code=data[3])
 
-
-#Code for running show_scan_results_for_item()
+# Code for running show_scan_results_for_item()
 # data = input('enter qr code: ')
 # list_1 = data.split(" ")
 # print(list_1[0])
