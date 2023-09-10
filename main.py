@@ -19,6 +19,7 @@ def database_creation(database_name):
         except sqlite3.OperationalError:
             print('That file already exist...')
     
+    # This code below will eventually need its own file.
     if os.path.isfile('product_information_database.db'):
         pass
     elif os.path.isfile('product_information_database.db') == False:
@@ -41,7 +42,7 @@ def database_creation(database_name):
             connection.commit()
 
 def update_all_qr_tags():
-    pass
+    print('Updating all qr tags with update-to-date locations and information')
 
 def generate_random_uuid():
     # This is used for identifying, product, totes and stockroom inventory.
@@ -70,7 +71,7 @@ def create_new_item_group(database_file_name, table_name):
         print(f'"{table_name}" already exist...')
 
 def show_scan_results_for_item(table_name=None, database_file_name=None, sku=None, unique_code=None):
-    # Show what's inside a database or get information about a product
+    # Show's all the items within a database. (Inventory database)
     if database_file_name and table_name != None:
         with sqlite3.connect(database_file_name) as connection:
             try:
@@ -82,14 +83,14 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                 print('Nothing was found')
     
     elif sku != None:
-        # Used for grabbing information on a product.
+        # Provides detailed information about a sku number (item/product)
         with sqlite3.connect('product_information_database.db') as connection:
             cursor = connection.cursor()
             sku_data = cursor.execute(f"SELECT {sku}, DESCRIPTION, PRICE from product_info")
             return sku_data.fetchone()
     
     elif unique_code != None:
-        # Look through all the databases within a directory for a specific item.
+        # Locate an item through all database files
         try:
             database = os.listdir() 
             database.remove('product_information_database.db')
@@ -114,7 +115,6 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
 
 def copy_item_to_inventory_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
     # Copy an item into a database
-    # To-Fix: Creation of a NONE database when destination_filename equals None
     sku_data = show_scan_results_for_item(unique_code=unique_code)
     try:
         if sku_data[0] != None:
@@ -132,7 +132,7 @@ def copy_item_to_inventory_database(unique_code=None, sku=None, destination_file
                             connection.commit()
                             # Delete data once it's been copied into the new database.
                             delete_items_from_database(unique_code=unique_code, new_destination_filename=str(destination_filename), new_destination_table_name=str(destination_table_name))
-                    except sqlite3.OperationalError as e:  
+                    except sqlite3.OperationalError as e:
                         print('Error scanned an item into an item.')
                         print(e)
                     except IndexError:
@@ -145,7 +145,7 @@ def copy_item_to_inventory_database(unique_code=None, sku=None, destination_file
         print('Item not found...')
 
 def delete_items_from_database(unique_code=None, new_destination_filename=None, new_destination_table_name=None):
-    # Delete an item from a database
+    # Deletes items from a database
     try:
         item_location_information = show_scan_results_for_item(unique_code=unique_code)  
         
@@ -164,17 +164,39 @@ def delete_items_from_database(unique_code=None, new_destination_filename=None, 
     except TypeError:
         print('The item is already deleted.')
 
+def unique_code_modification_and_transfer(sku_number=None, destination_filename=None, destination_table_name=None):
+    # Used for moving orginal data into new inventory locations, with new unique codes. Creating new items and moving them into new inventory locatiins.
+    # Also useful for when all items for a specific sku have been deleted.
+    with sqlite3.connect('product_information_database.db') as connection:
+        cursor = connection.cursor()
+        cursor = cursor.execute(f"SELECT {sku_number}, DESCRIPTION, PRICE from product_info")
+        sku_data = cursor.fetchone()
+        new_modified_data = [
+            (sku_data[0], sku_data[1], sku_data[2], generate_random_uuid())
+        ]
+        with sqlite3.connect(str(destination_filename)) as connection:
+            cursor = connection.cursor()
+            cursor.executemany(f'INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)', new_modified_data)
+            connection.commit()
+        print('Done..')
+
+sku = input('Scan or enter sku number: ')
+database_location = input('Scan the inventory qr tag: ')
+value = database_location.find(' ')
+unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=database_location[0:value], destination_table_name=database_location[value:])
+
+# Deleting an item - to be used for register by people.
 # item_to_scan = input("Scan the product qr code you want to delete: ")
 # delete_items_from_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0])
 
 # Code for copying items into a database
-try:
-    item_to_scan = input("Scan the product qr code: ")
-    database_to_scan = input('Scan the inventory qr tag: ')
-    value = database_to_scan.find(' ')
-    copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0:5], destination_filename=database_to_scan[0:value], destination_table_name=database_to_scan[value:].replace(' ', ''))
-except IndexError:
-    print('!! Error nothing was scanned. !!')
+# try:
+#     item_to_scan = input("Scan the product qr code: ")
+#     database_to_scan = input('Scan the inventory qr tag: ')
+#     value = database_to_scan.find(' ')
+#     copy_item_to_inventory_database(unique_code=str(item_to_scan[51:]), sku=item_to_scan[0:5], destination_filename=database_to_scan[0:value], destination_table_name=database_to_scan[value:].replace(' ', ''))
+# except IndexError:
+#     print('!! Error nothing was scanned. !!')
 
 # Code for creating database files
 #database_creation('BRANDNEWDATABASE')
