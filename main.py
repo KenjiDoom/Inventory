@@ -43,6 +43,19 @@ def database_creation(database_name):
 
 def update_all_qr_tags():
     print('Updating all qr tags with update-to-date locations and information')
+    for database in os.listdir():
+        if database.endswith('.db'):
+            with sqlite3.connect(database) as connection:
+                cursor = connection.cursor()
+                table_names = cursor.execute("""select name from sqlite_master where type='table';""")
+                results = table_names.fetchall()
+                for tables in results:
+                    generate_qr_codes_for_database(str(database), str(tables[0]))
+                    items = cursor.execute(f""" SELECT * from {tables[0]}""")
+                    sku_data = items.fetchall()
+                    for sku in sku_data:
+                        print(str(sku[0]) + ' ' + str(sku[3]) + ' ' + str(tables[0]) + ' ' + str(database))
+                        generate_qr_codes_for_sku(sku[0], sku[3], str(tables[0]), str(database))
 
 def generate_random_uuid():
     # This is used for identifying, product, totes and stockroom inventory.
@@ -52,11 +65,11 @@ def generate_random_uuid():
 def generate_qr_codes_for_database(database, table_name):
     # This needs to contain the table name and database file name
     img = qrcode.make(database + ' ' + table_name)
-    img.save(database.replace('.db', '') + '.png')
+    img.save(database.replace('.db', '') + '_' + table_name + '.png')
 
-def generate_qr_codes_for_sku(sku, table_name, database_file_name, unique_code):
+def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
     img = qrcode.make(str(sku) + ' ' + str(table_name) + ' ' + database_file_name + ' ' + str(unique_code))
-    img.save(str(sku) + '.png')
+    img.save(str(sku) + '_' + str(unique_code) + '.png')
 
 def create_new_item_group(database_file_name, table_name):
     # This function is used for creating a new item group. AKA: creating a new table within a database.
@@ -180,10 +193,13 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
             connection.commit()
         print('Done..')
 
-sku = input('Scan or enter sku number: ')
-database_location = input('Scan the inventory qr tag: ')
-value = database_location.find(' ')
-unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=database_location[0:value], destination_table_name=database_location[value:])
+update_all_qr_tags()
+
+# Create new items incase all have been deleted.
+# sku = input('Scan or enter sku number: ')
+# database_location = input('Scan the inventory qr tag: ')
+# value = database_location.find(' ')
+# unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=database_location[0:value], destination_table_name=database_location[value:])
 
 # Deleting an item - to be used for register by people.
 # item_to_scan = input("Scan the product qr code you want to delete: ")
