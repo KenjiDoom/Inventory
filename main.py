@@ -109,6 +109,7 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
             database.remove('product_information_database.db')
             for database_name in database:
                 if database_name.endswith('.db'):
+                    # Why is this code returning a NONE? 
                     with sqlite3.connect(database_name) as connection:
                         cursor = connection.cursor()
                         table_names = cursor.execute("""select name from sqlite_master where type='table';""")
@@ -118,11 +119,16 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                             with sqlite3.connect(database_name) as connection:
                                 cursor = connection.cursor()
                                 data = cursor.execute(f"""select {unique_code}, sku, description, price from {table_name} WHERE UNIQUE_CODE={unique_code}""")
-                                data = data.fetchone()
-                                if data == None:
+                                data = data.fetchall()
+                                value = len(data)
+                                if data == None or len(data) == 0:
                                     pass
                                 elif data != None:
-                                    return data[1], data[2], data[3], data[0], table_name, database_name
+                                    for i in range(value):
+                                        return data[i][1], data[i][2], data[i][3], data[i][0], table_name, database_name
+                                        #return data[0][1], data[0][2], data[0][3], data[0][0], table_name, database_name
+                                    
+                                    #return data[1], data[2], data[3], data[0], table_name, database_name
         except sqlite3.OperationalError:
             print('!! Error must have scanned an inventory qr tag instead of a item. !!')
 
@@ -144,11 +150,12 @@ def copy_item_to_inventory_database(unique_code=None, sku=None, destination_file
                             cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
                             connection.commit()
                             # Delete data once it's been copied into the new database.
-                            delete_items_from_database(unique_code=unique_code, new_destination_filename=str(destination_filename), new_destination_table_name=str(destination_table_name))
+                            #delete_items_from_database(unique_code=unique_code, new_destination_filename=str(destination_filename), new_destination_table_name=str(destination_table_name))
                     except sqlite3.OperationalError as e:
                         print('Error scanned an item into an item.')
                         print(e)
-                    except IndexError:
+                    except IndexError as e:
+                        print(e)
                         print('!! Error nothing was scanned. !!')
                 else:
                     print(destination_filename + ' not found...')
@@ -193,7 +200,7 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
             connection.commit()
         print('Done..')
 
-update_all_qr_tags()
+#update_all_qr_tags()
 
 # Create new items incase all have been deleted.
 # sku = input('Scan or enter sku number: ')
@@ -214,8 +221,10 @@ update_all_qr_tags()
 # except IndexError:
 #     print('!! Error nothing was scanned. !!')
 
+copy_item_to_inventory_database(unique_code=1133904014, destination_filename='OldDatabase.db', destination_table_name='OldDatabase_inventory')
+
 # Code for creating database files
-#database_creation('BRANDNEWDATABASE')
+#database_creation('OldDatabase')
 
 # Code for creating qr codes for items
 #data = show_scan_results_for_item(unique_code=5609943232)
