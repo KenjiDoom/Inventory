@@ -132,57 +132,44 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
         except sqlite3.OperationalError:
             print('!! Error must have scanned an inventory qr tag instead of a item. !!')
 
-def copy_item_to_inventory_database(unique_code=None, sku=None, destination_filename=None, destination_table_name=None):
+def copy_item_to_inventory_database(unique_code=None, destination_filename=None, destination_table_name=None):
     # Copy an item into a database
     sku_data = show_scan_results_for_item(unique_code=unique_code)
-    try:
-        if sku_data[0] != None:
-            if destination_filename == None:
-                pass
-            elif destination_filename != None:
-                if os.path.exists(destination_filename) == True:
-                    try:
-                        struct_data = [
-                            (sku_data[0], sku_data[1], sku_data[2], unique_code)
-                        ]
-                        with sqlite3.connect(str(destination_filename)) as connection:
-                            cursor = connection.cursor()
-                            cursor.executemany(f"INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)", struct_data)
-                            connection.commit()
-                            # Delete data once it's been copied into the new database.
-                            #delete_items_from_database(unique_code=unique_code, new_destination_filename=str(destination_filename), new_destination_table_name=str(destination_table_name))
-                    except sqlite3.OperationalError as e:
-                        print('Error scanned an item into an item.')
-                        print(e)
-                    except IndexError as e:
-                        print(e)
-                        print('!! Error nothing was scanned. !!')
-                else:
-                    print(destination_filename + ' not found...')
-        else:
+    if sku_data[0] != None:
+        if destination_filename == None:
             pass
-    except TypeError:
-        print('Item not found...')
+        elif destination_filename != None:
+            if os.path.exists(destination_filename) == True:
+                try:
+                    struct_data = [
+                        (sku_data[0], sku_data[1], sku_data[2], unique_code),
+                        (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5], destination_filename, destination_table_name),
+                    ]
+                    with sqlite3.connect(str(destination_filename)) as connection:
+                        cursor = connection.cursor()
+                        sql_command = f"INSERT INTO {destination_table_name} VALUES (:col1, :col2, :col3, :col4)"
+                        cursor.execute(sql_command, {'col1': struct_data[0][0], 'col2': struct_data[0][1], 'col3': struct_data[0][2], 'col4': struct_data[0][3]})
+                        connection.commit()
+                        delete_items_from_database(unique_code=unique_code, item_and_destination_data=struct_data[1])
+                except sqlite3.OperationalError as e:
+                    print('Error scanned an item into an item.')
+                    print(e)
+                except IndexError as e:
+                    print(e)
+                    print('!! Error nothing was scanned. !!')
+            else:
+                print(destination_filename + ' not found...')
+    else:
+        pass
 
-def delete_items_from_database(unique_code=None, new_destination_filename=None, new_destination_table_name=None):
+def delete_items_from_database(unique_code=None, item_and_destination_data=None):
     # Deletes items from a database
-    try:
-        item_location_information = show_scan_results_for_item(unique_code=unique_code)  
-        
-        file_data = [
-            item_location_information[5], item_location_information[4], new_destination_filename, new_destination_table_name
-        ]
-        print(file_data[0])
-        with sqlite3.connect(str(file_data[0])) as connection:
-            cursor = connection.cursor()
-            cursor.execute(f"""DELETE from {file_data[1]} where unique_code={unique_code}""")
-            print('Deleted.....')
-            connection.commit()
-    
-    except NameError:
-        print('The item is already deleted.')
-    except TypeError:
-        print('The item is already deleted.')
+    print(item_and_destination_data)
+    with sqlite3.connect(str(item_and_destination_data[5])) as connection:
+        cursor = connection.cursor()
+        cursor.execute(f"""DELETE from {str(item_and_destination_data[4])} where unique_code={str(unique_code)}""")
+        print('Deleted.....')
+        connection.commit()
 
 def unique_code_modification_and_transfer(sku_number=None, destination_filename=None, destination_table_name=None):
     # Used for moving orginal data into new inventory locations, with new unique codes. Creating new items and moving them into new inventory locatiins.
@@ -221,7 +208,7 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
 # except IndexError:
 #     print('!! Error nothing was scanned. !!')
 
-copy_item_to_inventory_database(unique_code=1133904014, destination_filename='OldDatabase.db', destination_table_name='OldDatabase_inventory')
+copy_item_to_inventory_database(unique_code=1386080148, destination_filename='New_testing_database.db', destination_table_name='New_testing_database_inventory')
 
 # Code for creating database files
 #database_creation('OldDatabase')
