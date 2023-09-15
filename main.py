@@ -83,7 +83,7 @@ def create_new_item_group(database_file_name, table_name):
     except sqlite3.OperationalError:
         print(f'"{table_name}" already exist...')
 
-def show_scan_results_for_item(table_name=None, database_file_name=None, sku=None, unique_code=None):
+def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=None, unique_code=None):
     # Show's all the items within a database. (Inventory database)
     if database_file_name and table_name != None:
         with sqlite3.connect(database_file_name) as connection:
@@ -95,11 +95,11 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
             except sqlite3.OperationalError:
                 print('Nothing was found')
     
-    elif sku != None:
+    elif SKU != None:
         # Provides detailed information about a sku number (item/product)
         with sqlite3.connect('product_information_database.db') as connection:
             cursor = connection.cursor()
-            sku_data = cursor.execute(f"SELECT {sku}, DESCRIPTION, PRICE from product_info")
+            sku_data = cursor.execute(f"SELECT {SKU}, DESCRIPTION, PRICE from product_info")
             return sku_data.fetchone()
     
     elif unique_code != None:
@@ -126,9 +126,6 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, sku=Non
                                 elif data != None:
                                     for i in range(value):
                                         return data[i][1], data[i][2], data[i][3], data[i][0], table_name, database_name
-                                        #return data[0][1], data[0][2], data[0][3], data[0][0], table_name, database_name
-                                    
-                                    #return data[1], data[2], data[3], data[0], table_name, database_name
         except sqlite3.OperationalError:
             print('!! Error must have scanned an inventory qr tag instead of a item. !!')
 
@@ -179,7 +176,7 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
     # Also useful for when all items for a specific sku have been deleted.
     with sqlite3.connect('product_information_database.db') as connection:
         cursor = connection.cursor()
-        cursor = cursor.execute(f"SELECT {sku_number}, DESCRIPTION, PRICE from product_info")
+        cursor = cursor.execute(f"SELECT {sku_number}, DESCRIPTION, PRICE from product_info WHERE sku={sku_number}")
         sku_data = cursor.fetchone()
         new_modified_data = [
             (sku_data[0], sku_data[1], sku_data[2], generate_random_uuid())
