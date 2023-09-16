@@ -68,7 +68,9 @@ def generate_qr_codes_for_database(database, table_name):
     img.save(database.replace('.db', '') + '_' + table_name + '.png')
 
 def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
-    img = qrcode.make(str(sku) + ' ' + str(table_name) + ' ' + database_file_name + ' ' + str(unique_code))
+    # unique codes need to come after sku numbers to have a fixed index number.
+    # WORKING ON THIS RIGHT NOW
+    img = qrcode.make(str(sku) + ' ' + str(unique_code) + ' ' + str(table_name) + ' ' + database_file_name)
     img.save(str(sku) + '_' + str(unique_code) + '.png')
 
 def create_new_item_group(database_file_name, table_name):
@@ -163,13 +165,24 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
         print('Error item not found...' + str(e))
 
 def delete_items_from_database(unique_code=None, item_and_destination_data=None):
-    # Deletes items from a database
-    print(item_and_destination_data)
-    with sqlite3.connect(str(item_and_destination_data[5])) as connection:
-        cursor = connection.cursor()
-        cursor.execute(f"""DELETE from {str(item_and_destination_data[4])} where unique_code={str(unique_code)}""")
-        print('Deleted.....')
-        connection.commit()
+    # Left off here
+    if item_and_destination_data != None:
+        print(item_and_destination_data)
+        with sqlite3.connect(str(item_and_destination_data[5])) as connection:
+            cursor = connection.cursor()
+            cursor.execute(f"""DELETE from {str(item_and_destination_data[4])} where unique_code={str(unique_code)}""")
+            print('Deleted.....')
+            connection.commit()
+    elif item_and_destination_data == None:
+        item_data = show_scan_results_for_item(unique_code=unique_code)
+        try:
+            with sqlite3.connect(str(item_data[5])) as connection:
+                cursor = connection.cursor()
+                cursor.execute(f"""DELETE from {str(item_data[4])} where unique_code={str(unique_code)}""")
+                print('Deleted.....')
+                connection.commit()
+        except TypeError as e:
+            print('Item not found ' + str(e))
 
 def unique_code_modification_and_transfer(sku_number=None, destination_filename=None, destination_table_name=None):
     # Used for moving orginal data into new inventory locations, with new unique codes. Creating new items and moving them into new inventory locatiins.
