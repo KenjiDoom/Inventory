@@ -165,7 +165,6 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
         print('Error item not found...' + str(e))
 
 def delete_items_from_database(unique_code=None, item_and_destination_data=None):
-    # Left off here
     if item_and_destination_data != None:
         print(item_and_destination_data)
         with sqlite3.connect(str(item_and_destination_data[5])) as connection:
@@ -173,6 +172,7 @@ def delete_items_from_database(unique_code=None, item_and_destination_data=None)
             cursor.execute(f"""DELETE from {str(item_and_destination_data[4])} where unique_code={str(unique_code)}""")
             print('Deleted.....')
             connection.commit()
+    
     elif item_and_destination_data == None:
         item_data = show_scan_results_for_item(unique_code=unique_code)
         try:
@@ -199,3 +199,27 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
             cursor.executemany(f'INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)', new_modified_data)
             connection.commit()
         print('Done..')
+
+def total_amount_sku(sku_number=None):
+    total_amount = []
+    database = os.listdir()
+    database.remove('product_information_database.db')
+    for database_name in database:
+        if database_name.endswith('.db'):
+            with sqlite3.connect(database_name) as connection:
+                cursor = connection.cursor()
+                table_names = cursor.execute(""" select name from sqlite_master where type='table';""")
+                results = table_names.fetchall()
+                for table in results:
+                    table_name = table[0]
+                    with sqlite3.connect(database_name) as connection:
+                        cursor = connection.cursor()
+                        data = cursor.execute(f"""select {sku_number} from {table_name}""")
+                        data = data.fetchall()
+                        if data == None or len(data) == 0:
+                            pass
+                        else:
+                            total_amount.append(data)
+    print('We have a total of ' + str(len(total_amount)))
+
+total_amount_sku(sku_number='40456')
