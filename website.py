@@ -9,12 +9,32 @@ def website():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':        
-        store_number = request.form['storeNumber']
-        username = request.form['username']
-        password = request.form['password']
+    if request.method == 'POST':
+        if request.method == 'POST':
+            try:
+                connection = sqlite3.connect('user-data.db')
+                cursor = connection.cursor()
 
-        print(store_number, username, password)
+                store_number = request.form['storeNumber']
+                username = request.form['username']
+                password = request.form['password']
+
+                print(store_number, username, password)
+
+                cursor.execute(f"SELECT storeID, username, password FROM users WHERE username={username} and password={password}")
+                
+                print('--------')
+                results = cursor.fetchall()
+                print(results)
+
+                if len(results) == 0:
+                    print('Sorry incorrect creds. Try again...')
+                else:
+                    return render_template('inventory.html')
+            except sqlite3.OperationalError as e:
+                print(e)
+                print(username + 'not found...')
+
 
     return render_template('login.html')
 
