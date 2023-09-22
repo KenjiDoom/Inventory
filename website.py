@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-import sqlite3
+import sqlite3, socket
 
 app = Flask(__name__)
 
@@ -10,34 +10,27 @@ def website():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.method == 'POST':
-            try:
-                connection = sqlite3.connect('user-data.db')
-                cursor = connection.cursor()
+        with sqlite3.connect('user-data.db') as connection:
+            cursor = connection.cursor()
+        
+            store_number = request.form['storeNumber']
+            username = request.form['username']
+            password = request.form['password']
 
-                store_number = request.form['storeNumber']
-                username = request.form['username']
-                password = request.form['password']
-
-                print(store_number, username, password)
-
-                cursor.execute(f"SELECT storeID, username, password FROM users WHERE username={username} and password={password}")
-                
-                print('--------')
-                results = cursor.fetchall()
-                print(results)
-
-                if len(results) == 0:
-                    print('Sorry incorrect creds. Try again...')
-                else:
-                    return render_template('inventory.html')
-            except sqlite3.OperationalError as e:
-                print(e)
-                print(username + 'not found...')
+            query = "SELECT storeID, username, password FROM users WHERE storeID=? and username=? AND password=?"
+            data = cursor.execute(query, (store_number, username, password))
+            result = data.fetchone()
+        
+        if len(result) == 0:
+            print('Sorry incorrect creds. Try again...')
+        else:
+            print('Login sucessful')
+            return render_template('inventory.html')
 
 
     return render_template('login.html')
 
         
 if __name__ == "__main__":
-    app.run(host="192.168.1.81", port=4000)
+    IP = socket.gethostbyname(socket.gethostname())
+    app.run(host=str(IP), port=4000)
