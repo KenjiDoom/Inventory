@@ -18,28 +18,6 @@ def database_creation(database_name):
                 connection.commit()
         except sqlite3.OperationalError:
             print('That file already exist...')
-    
-    # This code below will eventually need its own file.
-    if os.path.isfile('product_information_database.db'):
-        pass
-    elif os.path.isfile('product_information_database.db') == False:
-        with sqlite3.connect('product_information_database.db') as connection:
-            cursor = connection.cursor()
-            generate_qr_codes_for_database('product_information_database.db', 'product_info')
-            cursor.execute("create table product_info(SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer)")
-            data = [
-                (10034, 'Gaming key binds', 10, 3236630686),
-                (40456, 'Mousepad', 5, 2761298854),
-                (68896, 'Headset', 15, 5609943232),
-            ]
-            cursor.executemany('INSERT INTO product_info VALUES(?,?,?,?)', data)
-            connection.commit()
-
-            cursor.execute("SELECT * FROM product_info")
-            rows = cursor.fetchall()
-
-            print(rows)
-            connection.commit()
 
 def update_all_qr_tags():
     print('Updating all qr tags with update-to-date locations and information')
@@ -221,5 +199,3 @@ def total_amount_sku(sku_number=None):
                         else:
                             total_amount.append(data)
     print('We have a total of ' + str(len(total_amount)))
-
-total_amount_sku(sku_number='40456')
