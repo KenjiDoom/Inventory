@@ -35,7 +35,12 @@ def login():
 def search():
     if request.method == 'POST':
         sku_number = request.form['sku']
-        print(sku_number)
+        sku_result = show_scan_results_for_item(SKU=str(sku_number))
+        
+        if len(sku_result) == 0 or None:
+            return ('Sku was not found...')
+        else:
+            return sku_result
 
     return render_template('search.html')
 
