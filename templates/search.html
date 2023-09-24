@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SKU Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .search-container {
+            text-align: center;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 30px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #dd0808; /* Blue border color on focus */
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 30px;
+            background-color: #1f1f20; /* Blue button background color */
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #d60b0b; /* Darker blue on hover */
+        }
+        
+        .h1{
+            padding: 10px 20px;
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+        <h1 class="h1">Item Search</h1>
+        <form method="POST">
+            <div class="search-container"></div>
+                <input type="text" name='sku' placeholder="Enter SKU">
+                <button type="submit">Search</button>
+        </form>
+    </div>
+</body>
+</html>
+
