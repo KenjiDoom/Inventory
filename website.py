@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 import sqlite3, socket
+from main import *
 
 app = Flask(__name__)
 
@@ -21,16 +22,23 @@ def login():
             data = cursor.execute(query, (store_number, username, password))
             result = data.fetchone()
         
-        if len(result) == 0:
+        if len(result) == None:
             print('Sorry incorrect creds. Try again...')
         else:
             print('Login sucessful')
-            return render_template('inventory.html')
 
+            return render_template('inventory.html')
 
     return render_template('login.html')
 
-        
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST':
+        sku_number = request.form['sku']
+        print(sku_number)
+
+    return render_template('search.html')
+
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
     app.run(host=str(IP), port=4000)
