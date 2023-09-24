@@ -1,3 +1,63 @@
+<!DOCTYPE html>
 <html>
-	<p> Welcome!! </p>
+<head>
+    <title> Inventory </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff; /* White background for the body */
+        }
+
+        header {
+            background-color: #070707; /* Blue header background */
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        nav {
+            text-align: center;
+            background-color: #000000; /* Red navigation bar background */
+        }
+
+        nav button {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+            background-color: #fff; /* White button background */
+            color: #000; /* Black button text color */
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        nav button:hover {
+            background-color: #ddd; /* Light gray on hover */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1> Inventory </h1>
+    </header>
+    <nav>
+        <button>Inven Report</button>
+        <button onclick="skupage()">SKU Search</button>
+        <button>Register</button>
+        <button>LabelPro</button>
+        <button>Stock Adjustment</button>
+    </nav>
+    
+    <div style="background-color: #fff; padding: 20px;">
+		<script>
+			function skupage() {
+				window.open('search')
+			}
+		</script>
+    </div>
+
+</body>
 </html>
