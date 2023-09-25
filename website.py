@@ -11,23 +11,32 @@ def website():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        with sqlite3.connect('user-data.db') as connection:
-            cursor = connection.cursor()
-        
-            store_number = request.form['storeNumber']
-            username = request.form['username']
-            password = request.form['password']
+        try:
+            if os.path.exists('user-data.db'):
+                with sqlite3.connect('user-data.db') as connection:
+                    cursor = connection.cursor()
 
-            query = "SELECT storeID, username, password FROM users WHERE storeID=? and username=? AND password=?"
-            data = cursor.execute(query, (store_number, username, password))
-            result = data.fetchone()
-        
-        if len(result) == None:
-            print('Sorry incorrect creds. Try again...')
-        else:
-            print('Login sucessful')
+                    store_number = request.form['storeNumber']
+                    username = request.form['username']
+                    password = request.form['password']
 
-            return render_template('inventory.html')
+                    query = "SELECT storeID, username, password FROM users WHERE storeID=? and username=? AND password=?"
+                    data = cursor.execute(query, (store_number, username, password))
+                    result = data.fetchone()
+
+                if len(result) == None:
+                    print('Sorry incorrect creds. Try again...')
+                else:
+                    print('Login sucessful')
+
+                    return render_template('inventory.html')
+            else:
+                return render_template('error_message.html')
+        except sqlite3.OperationalError as e:
+            if os.path.exists('user-data.db') == True:
+                pass
+            else:
+                print('Table does not exist.')
 
     return render_template('login.html')
 
