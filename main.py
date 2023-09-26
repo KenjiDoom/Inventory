@@ -76,11 +76,14 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
                 print('Nothing was found')
     
     elif SKU != None:
-        # Provides detailed information about a sku number (item/product)
-        with sqlite3.connect('product_information_database.db') as connection:
-            cursor = connection.cursor()
-            sku_data = cursor.execute(f"SELECT {SKU}, DESCRIPTION, PRICE from product_info")
-            return sku_data.fetchone()
+        try:
+            # Provides detailed information about a sku number (item/product)
+            with sqlite3.connect('product_information_database.db') as connection:
+                cursor = connection.cursor()
+                sku_data = cursor.execute(f"SELECT {SKU}, DESCRIPTION, PRICE from product_info where sku={SKU}")
+                return sku_data.fetchone()
+        except sqlite3.OperationalError:
+            return SKU + ' not found'
     
     elif unique_code != None:
         # Locate an item through all database files
