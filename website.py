@@ -45,8 +45,8 @@ def search():
     if request.method == 'POST':
         sku_number = request.form['sku']
         sku_result = show_scan_results_for_item(SKU=str(sku_number))
-        
-        if len(sku_result) == 0 or None:
+ 
+        if sku_result == None:
             return ('Sku was not found...')
         else:
             print(sku_result)
