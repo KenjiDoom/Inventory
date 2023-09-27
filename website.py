@@ -49,7 +49,7 @@ def search():
         if sku_result == None:
             return ('Sku was not found...')
         else:
-            print(sku_result)
+            print(sku_result[0])
             return str(sku_result)
 
     return render_template('search.html')
