@@ -24,8 +24,8 @@ def login():
                     data = cursor.execute(query, (store_number, username, password))
                     result = data.fetchone()
 
-                if len(result) == None:
-                    print('Sorry incorrect creds. Try again...')
+                if result == None:
+                    return render_template('login.html', error_message='Sorry incorrect creds. Try again...')
                 else:
                     print('Login sucessful')
 
@@ -47,13 +47,13 @@ def search():
         sku_result = show_scan_results_for_item(SKU=str(sku_number))
  
         if sku_result == None:
-            return ('Sku was not found...')
+            return render_template('search.html', error_message='Sku was not found...')
         else:
-            print(sku_result[0])
-            return str(sku_result)
+            results = [(sku_result[0], sku_result[1], sku_result[2])]
+            return render_template('search.html', results=results)
 
     return render_template('search.html')
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
-    app.run(host=str(IP), port=4000)
+    app.run(host='192.168.1.81', port=4000)
