@@ -88,8 +88,14 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
     elif unique_code != None:
         # Locate an item through all database files
         try:
+            exclude_db_names = ['product_information_database.db', 'user-data.db']
             database = os.listdir() 
-            database.remove('product_information_database.db')
+            for ex_db in exclude_db_names:
+                try:
+                    database.remove(ex_db)
+                except ValueError:
+                    pass
+                
             for database_name in database:
                 if database_name.endswith('.db'):
                     # Why is this code returning a NONE? 
@@ -101,7 +107,7 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
                             table_name = table[0]
                             with sqlite3.connect(database_name) as connection:
                                 cursor = connection.cursor()
-                                data = cursor.execute(f"""select {unique_code}, sku, description, price from {table_name} WHERE UNIQUE_CODE={unique_code}""")
+                                data = cursor.execute(f"""select {unique_code}, SKU, DESCRIPTION, PRICE from {table_name} WHERE UNIQUE_CODE={unique_code}""")
                                 data = data.fetchall()
                                 value = len(data)
                                 if data == None or len(data) == 0:
@@ -109,7 +115,8 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
                                 elif data != None:
                                     for i in range(value):
                                         return data[i][1], data[i][2], data[i][3], data[i][0], table_name, database_name
-        except sqlite3.OperationalError:
+        except sqlite3.OperationalError as e:
+            print(e)
             print('!! Error must have scanned an inventory qr tag instead of a item. !!')
 
 def copy_item_to_inventory_database(unique_code=None, destination_filename=None, destination_table_name=None):
