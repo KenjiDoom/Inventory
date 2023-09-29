@@ -43,14 +43,21 @@ def login():
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
-        sku_number = request.form['sku']
-        sku_result = show_scan_results_for_item(SKU=str(sku_number))
- 
-        if sku_result == None:
+        try:
+            sku_number = request.form['sku']
+            if len(sku_number) == 5:
+                sku_result = show_scan_results_for_item(SKU=str(sku_number))
+            elif len(sku_number) > 5:
+                sku_result = show_scan_results_for_item(unique_code=str(sku_number[6:16]))
+
+            if sku_result == None:
+                return render_template('search.html', error_message='Sku was not found...')
+            else:
+                results = [(sku_result[0], sku_result[1], sku_result[2])]
+                return render_template('search.html', results=results)
+        
+        except UnboundLocalError:
             return render_template('search.html', error_message='Sku was not found...')
-        else:
-            results = [(sku_result[0], sku_result[1], sku_result[2])]
-            return render_template('search.html', results=results)
 
     return render_template('search.html')
 
