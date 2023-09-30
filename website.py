@@ -4,13 +4,20 @@ from main import *
 
 app = Flask(__name__)
 
-@app.route("/")
-def website():
-    return render_template('index.html')
+# @app.route("/")
+# def website():
+#     return render_template('index.html')
 
+@app.route("/", methods=['GET', 'POST'])
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
+        def user_database_validation():
+            if os.path.exists('user-data.db') == True:
+                return True
+            else:
+                return 'Back-end database not found...'
+        
         try:
             if os.path.exists('user-data.db'):
                 with sqlite3.connect('user-data.db') as connection:
@@ -23,20 +30,21 @@ def login():
                     query = "SELECT storeID, username, password FROM users WHERE storeID=? and username=? AND password=?"
                     data = cursor.execute(query, (store_number, username, password))
                     result = data.fetchone()
+                    print(result)
 
                 if result == None:
                     return render_template('login.html', error_message='Sorry incorrect creds. Try again...')
                 else:
-                    print('Login sucessful')
-
                     return render_template('inventory.html')
             else:
-                return render_template('error_message.html')
+                db_status = user_database_validation()
+                return render_template('error_message.html', error_message=str(db_status))
+        
         except sqlite3.OperationalError as e:
-            if os.path.exists('user-data.db') == True:
+            if user_database_validation() == True:
                 pass
             else:
-                print('Table does not exist.')
+                print('Missing the user database')
 
     return render_template('login.html')
 

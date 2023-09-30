@@ -6,6 +6,11 @@
 <body>
 
 <h1>Internal Server Error Occurred</h1>
+    {% if error_message %}
+        <div>
+            {{ error_message }}
+        </div>
+    {% endif %}
 
 </body>
 </html> 
