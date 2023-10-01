@@ -1,4 +1,5 @@
 import sqlite3, os, uuid, qrcode
+from PIL import Image, ImageDraw, ImageFont
 
 def database_creation(database_name):
     if os.path.isfile(database_name):
@@ -46,10 +47,29 @@ def generate_qr_codes_for_database(database, table_name):
     img.save(database.replace('.db', '') + '_' + table_name + '.png')
 
 def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
-    # unique codes need to come after sku numbers to have a fixed index number.
-    # WORKING ON THIS RIGHT NOW
-    img = qrcode.make(str(sku) + ' ' + str(unique_code) + ' ' + str(table_name) + ' ' + database_file_name)
-    img.save(str(sku) + '_' + str(unique_code) + '.png')
+    qr = qrcode.QRCode(
+        version=3,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=3,
+        border=10,
+    )
+
+    qr.add_data(str(sku) + ' ' + str(unique_code) + ' ' + str(table_name) + ' ' + database_file_name)
+    qr.make(fit=True)
+
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    draw = ImageDraw.Draw(qr_img)
+    
+    text = str(sku)
+    font = ImageFont.truetype("NotoSansKannadaUI-Black.ttf", size=33)
+    
+    img_width, img_height = qr_img.size
+    text_x = (img_width - 90) // 2
+    text_y = img_height - 40
+
+    draw.text((text_x, text_y), text, fill="black", font=font)
+
+    qr_img.save(str(sku) + '_' + str(unique_code) + '.png')
 
 def create_new_item_group(database_file_name, table_name):
     # This function is used for creating a new item group. AKA: creating a new table within a database.
