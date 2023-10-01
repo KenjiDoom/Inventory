@@ -32,8 +32,8 @@ def update_all_qr_tags():
                     items = cursor.execute(f""" SELECT * from {tables[0]}""")
                     sku_data = items.fetchall()
                     for sku in sku_data:
-                        print(str(sku[0]) + ' ' + str(sku[3]) + ' ' + str(tables[0]) + ' ' + str(database))
-                        generate_qr_codes_for_sku(sku[0], sku[3], str(tables[0]), str(database))
+                        print(str(sku[0]) + ' ' + str(sku[2]) + ' ' + str(tables[0]) + ' ' + str(database))
+                        generate_qr_codes_for_sku(sku[0], sku[2], str(tables[0]), str(database))
 
 def generate_random_uuid():
     # This is used for identifying, product, totes and stockroom inventory.
@@ -94,11 +94,9 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
                 try:
                     database.remove(ex_db)
                 except ValueError:
-                    pass
-                
+                    pass                
             for database_name in database:
                 if database_name.endswith('.db'):
-                    # Why is this code returning a NONE? 
                     with sqlite3.connect(database_name) as connection:
                         cursor = connection.cursor()
                         table_names = cursor.execute("""select name from sqlite_master where type='table';""")
