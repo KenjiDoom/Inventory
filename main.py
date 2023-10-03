@@ -32,11 +32,9 @@ def update_all_qr_tags():
                     generate_qr_codes_for_database(str(database), str(tables[0]))
                     items = cursor.execute(f""" SELECT * from {tables[0]}""")
                     sku_data = items.fetchall()
-                    # For loop is not grabbing entire unique code value
                     for sku in sku_data:
-                        print(str(sku[2]))
-                        print(str(sku[0]) + ' ' + str(sku[2]) + ' ' + str(tables[0]) + ' ' + str(database))
-                        generate_qr_codes_for_sku(sku[0], sku[2], str(tables[0]), str(database))
+                        print(str(sku[0]) + ' ' + str(sku[3]) + ' ' + str(tables[0]) + ' ' + str(database))
+                        generate_qr_codes_for_sku(sku[0], sku[3], str(tables[0]), str(database))
 
 def generate_random_uuid():
     # This is used for identifying, product, totes and stockroom inventory.
