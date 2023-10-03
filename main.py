@@ -32,7 +32,9 @@ def update_all_qr_tags():
                     generate_qr_codes_for_database(str(database), str(tables[0]))
                     items = cursor.execute(f""" SELECT * from {tables[0]}""")
                     sku_data = items.fetchall()
+                    # For loop is not grabbing entire unique code value
                     for sku in sku_data:
+                        print(str(sku[2]))
                         print(str(sku[0]) + ' ' + str(sku[2]) + ' ' + str(tables[0]) + ' ' + str(database))
                         generate_qr_codes_for_sku(sku[0], sku[2], str(tables[0]), str(database))
 
@@ -42,9 +44,35 @@ def generate_random_uuid():
     return data[0:10]
 
 def generate_qr_codes_for_database(database, table_name):
-    # This needs to contain the table name and database file name
-    img = qrcode.make(database + ' ' + table_name)
-    img.save(database.replace('.db', '') + '_' + table_name + '.png')
+    qr = qrcode.QRCode(
+        version=10,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=3,
+        border=10,
+    )
+    qr.add_data(database + ' ' + table_name)
+    qr.make(fit=True)
+
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    draw = ImageDraw.Draw(qr_img)
+    
+    text = str(table_name)
+    font = ImageFont.load_default()
+
+    text_bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+    
+    img_width, img_height = qr_img.size
+    text_x = (img_width - text_width) // 2
+    text_y = img_height - text_height - 10 
+    
+    font_size = 15
+    font = ImageFont.truetype("DejaVuSans.ttf", size=font_size) 
+    
+    draw.text((text_x, text_y), text, fill="black", font=font)
+
+    qr_img.save(database.replace('.db', '') + '_' + table_name + '.png')
 
 def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
     qr = qrcode.QRCode(
@@ -53,7 +81,6 @@ def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
         box_size=3,
         border=10,
     )
-
     qr.add_data(str(sku) + ' ' + str(unique_code) + ' ' + str(table_name) + ' ' + database_file_name)
     qr.make(fit=True)
 
@@ -61,7 +88,7 @@ def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
     draw = ImageDraw.Draw(qr_img)
     
     text = str(sku)
-    font = ImageFont.truetype("NotoSansKannadaUI-Black.ttf", size=33)
+    font = ImageFont.truetype("DejaVuSans.ttf", size=30)
     
     img_width, img_height = qr_img.size
     text_x = (img_width - 90) // 2
