@@ -22,19 +22,29 @@ def database_creation(database_name):
 
 def update_all_qr_tags():
     print('Updating all qr tags with update-to-date locations and information')
-    for database in os.listdir():
-        if database.endswith('.db'):
-            with sqlite3.connect(database) as connection:
-                cursor = connection.cursor()
-                table_names = cursor.execute("""select name from sqlite_master where type='table';""")
-                results = table_names.fetchall()
-                for tables in results:
-                    generate_qr_codes_for_database(str(database), str(tables[0]))
-                    items = cursor.execute(f""" SELECT * from {tables[0]}""")
-                    sku_data = items.fetchall()
-                    for sku in sku_data:
-                        print(str(sku[0]) + ' ' + str(sku[3]) + ' ' + str(tables[0]) + ' ' + str(database))
-                        generate_qr_codes_for_sku(sku[0], sku[3], str(tables[0]), str(database))
+    try:
+        exclude_db_names = ['user-data.db']
+        database_name = os.listdir() 
+        for ex_db in exclude_db_names:
+            try:
+                database_name.remove(ex_db)
+            except ValueError:
+                pass
+        for database in database_name:
+            if database.endswith('.db'):
+                with sqlite3.connect(database) as connection:
+                    cursor = connection.cursor()
+                    table_names = cursor.execute("""select name from sqlite_master where type='table';""")
+                    results = table_names.fetchall()
+                    for tables in results:
+                        generate_qr_codes_for_database(str(database), str(tables[0]))
+                        items = cursor.execute(f""" SELECT * from {tables[0]}""")
+                        sku_data = items.fetchall()
+                        for sku in sku_data:
+                            print(str(sku[0]) + ' ' + str(sku[3]) + ' ' + str(tables[0]) + ' ' + str(database))
+                            generate_qr_codes_for_sku(sku[0], sku[3], str(tables[0]), str(database))
+    except sqlite3.OperationalError:
+        pass
 
 def generate_random_uuid():
     # This is used for identifying, product, totes and stockroom inventory.
