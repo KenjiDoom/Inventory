@@ -73,9 +73,17 @@ def labelpro():
     # Idea: Scan SKU or inventory name for generating all the qr tags within that (tote, isle, inventory) (barcode)
     if request.method == 'POST':
         if request.form.get('item_button') == 'item':
-            print('Item was clicked')
+            try:
+                ID_code = request.form['item_name']
+                # To-do: Detect if string is longer then 5 characters for a scan
+                data = show_scan_results_for_item(unique_code=ID_code)
+                generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[4], database_file_name=data[5])
+                print('Done')
+            except TypeError:
+                return render_template('label.html', error_message='Nothing was entered...')
         elif request.form.get('inventory_button') == 'inventory':
-            print('inventory was clicked')
+            inventory_name = request.form['item_name']
+            print(inventory_name)
 
     return render_template('label.html')
 
