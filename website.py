@@ -4,10 +4,6 @@ from main import *
 
 app = Flask(__name__)
 
-# @app.route("/")
-# def website():
-#     return render_template('index.html')
-
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -30,7 +26,6 @@ def login():
                     query = "SELECT storeID, username, password FROM users WHERE storeID=? and username=? AND password=?"
                     data = cursor.execute(query, (store_number, username, password))
                     result = data.fetchone()
-                    print(result)
 
                 if result == None:
                     return render_template('login.html', error_message='Sorry incorrect creds. Try again...')
@@ -48,6 +43,7 @@ def login():
 
     return render_template('login.html')
 
+# Sku Search function
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
@@ -68,6 +64,21 @@ def search():
             return render_template('search.html', error_message='Sku was not found...')
 
     return render_template('search.html')
+
+@app.route('/label', methods=['GET', 'POST'])
+def labelpro():
+    # 1. Update all qr tags in a database or all databases. (Also known as print all the items within a database)
+    # 2. Update or generate a specific qr tag for a specific item (using unique_code or sku). 
+    # 3. Show avaiable QR tag options
+    # Idea: Scan SKU or inventory name for generating all the qr tags within that (tote, isle, inventory) (barcode)
+    if request.method == 'POST':
+        if request.form['item_name'] == "item":
+            print('item')
+        elif request.form['inventory_button'] == 'inventory':
+            print('inventory')
+        
+
+    return render_template('label.html')
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
