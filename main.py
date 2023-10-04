@@ -262,3 +262,27 @@ def total_amount_sku(sku_number=None):
                         else:
                             total_amount.append(data)
     print('We have a total of ' + str(len(total_amount)))
+
+
+def validate_table_name(table_name=None):
+    # This should provide a table name and database name
+    valid_database_name = []
+    database = os.listdir()
+    for database_name in database:
+        if database_name.endswith('.db'):
+            with sqlite3.connect(database_name) as connection:
+                cursor = connection.cursor()
+                table_names = cursor.execute(""" select name from sqlite_master where type='table';""")
+                for table in table_names.fetchall():
+                    if table[0] == table_name:
+                        valid_database_name.append(database_name)
+                        valid_database_name.append(table_name)
+                    else:
+                        pass
+
+    return valid_database_name
+
+
+# data = validate_table_name(table_name='hello_inventory')
+# print(data)
+# print(data[0])
