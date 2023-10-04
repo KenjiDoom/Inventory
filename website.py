@@ -72,11 +72,10 @@ def labelpro():
     # 3. Show avaiable QR tag options
     # Idea: Scan SKU or inventory name for generating all the qr tags within that (tote, isle, inventory) (barcode)
     if request.method == 'POST':
-        if request.form['item_name'] == "item":
-            print('item')
-        elif request.form['inventory_button'] == 'inventory':
-            print('inventory')
-        
+        if request.form.get('item_button') == 'item':
+            print('Item was clicked')
+        elif request.form.get('inventory_button') == 'inventory':
+            print('inventory was clicked')
 
     return render_template('label.html')
 
