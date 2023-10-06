@@ -81,11 +81,20 @@ def labelpro():
                     print('Done')
             elif request.form.get('inventory_button') == 'inventory':
                 inventory_name = request.form['item_name']
-                print(inventory_name)
-                table = validate_table_name(database=inventory_name)
-                generate_qr_codes_for_database(database=table[0], table_name=table[1])
+
+                if inventory_name == []:
+                    print('Empty')
+                    pass
+                elif inventory_name != []:    
+                    print(str(inventory_name))
+                    table = validate_table_name(table_name=str(inventory_name))
+                    generate_qr_codes_for_database(database=str(table[0]), table_name=str(table[1]))
+                    print('Done..')
         except TypeError:
-            return render_template('label.html', error_message='Nothing was entered...')
+            return render_template('label.html', error_message='Something went wrong...')
+        except IndexError:
+            return render_template('label.html', error_message='Something went wrong...')
+
     return render_template('label.html')
 
 if __name__ == "__main__":
