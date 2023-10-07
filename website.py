@@ -75,24 +75,39 @@ def labelpro():
         try:
             if request.form.get('item_button') == 'item':
                     ID_code = request.form['item_name']
-                    # To-do: Detect if string is longer then 5 characters for a scan
                     data = show_scan_results_for_item(unique_code=ID_code)
+                    # This is giving a None error
                     generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[4], database_file_name=data[5])
-                    print('Done')
+                    total_amount = total_amount_sku(sku_number=data[0])
+                    results = [(data[0], data[1], total_amount, data[3])]
+                    
+                    tr_names = [('Sku', 'Description', 'Total OH', 'ID Code')]
+
+                    return render_template('label.html', results=results, tr_names=tr_names)
+            
             elif request.form.get('inventory_button') == 'inventory':
                 inventory_name = request.form['item_name']
-
                 if inventory_name == []:
                     print('Empty')
                     pass
                 elif inventory_name != []:    
-                    print(str(inventory_name))
+                    total_amount_sku = []
+                    
                     table = validate_table_name(table_name=str(inventory_name))
+                    inventory_data = show_scan_results_for_item(table_name=str(table[1]), database_file_name=str(table[0]))
                     generate_qr_codes_for_database(database=str(table[0]), table_name=str(table[1]))
+
+                    tr_names = [('Sku', 'Description', 'Total In Tote', 'ID Code')]
+                    results = inventory_data[0]
+                    
+                    return render_template('label.html', results=results, tr_names=tr_names)
+
                     print('Done..')
-        except TypeError:
+        except TypeError as e:
+            print(e)
             return render_template('label.html', error_message='Something went wrong...')
-        except IndexError:
+        except IndexError as e:
+            print(e)
             return render_template('label.html', error_message='Something went wrong...')
 
     return render_template('label.html')
