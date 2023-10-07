@@ -76,19 +76,23 @@
         {% endif %}
     <!-- return sku information into a table set for the user -->
     <table>
+        {% for name in tr_names%}
         <tr>
-            <th> Sku </th>
-            <th> Description </th>
-            <th> Total OH </th>
+            <th>{{ name[0] }}</th>
+            <th> {{ name[1] }}</th>
+            <th> {{ name[2] }}</th>
+            <th> {{ name[3] }}</th>
         </tr>
+        {% endfor %}
+
         {% for result in results %}
         <tr>
             <td>{{ result[0] }}</td>
             <td>{{ result[1] }}</td>
             <td>{{ result[2] }}</td>
+            <th>{{ result[3] }}</th>
         </tr>
         {% endfor %}
-        <!-- Left off here fix the java script code-->
     </table>
     </form>
     </div>  
