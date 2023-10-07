@@ -52,50 +52,46 @@
             font-size: 20px;
             color: red;
         }
-        table {
-            width: 50%;
-            height: 50%;
-            visibility: hidden;
+        table, th, td {
+            border: 1px solid;
+            border-style: ridge;
+            margin-left: auto;
+            margin-right: auto;
         }
     </style>
 </head>
 <body>
     <div class="container">
     <form method="POST" class="label-form">
-        <button class="button" name="item_button" value="item">Item</button>
+        <!-- Button here-->
+        <button class="button" id="sku_button" name="item_button" value="item">Item</button>
         <button class="button2" name="inventory_button" value="inventory">Inventory</button>
-
-        <input type="text" id="item_name" name="item_name" onkeyup=search() ="ID/Inventory..">
+        
+        <!-- Input here-->
+        <input type="text" id="item_name" name="item_name" placeholder="ID/Inventory..">
         {% if error_message %}
         <div id="error_message">
             {{ error_message }}
         </div>
         {% endif %}
     <!-- return sku information into a table set for the user -->
-    <table id="table1">
+    <table>
         <tr>
             <th> Sku </th>
             <th> Description </th>
+            <th> Total OH </th>
         </tr>
         {% for result in results %}
         <tr>
             <td>{{ result[0] }}</td>
             <td>{{ result[1] }}</td>
+            <td>{{ result[2] }}</td>
         </tr>
         {% endfor %}
-        <script> 
-            document.getElementById("item_name").addEventListener('change', function() {
-                if (document.getElementById("item_name").value.length > 1) {
-                    document.getElementById("table1").style.visibility = "visible";
-            }   else {
-                    document.getElementById("table1").style.visibility = "hidden";
-                }
-            });
-        </script>
         <!-- Left off here fix the java script code-->
     </table>
     </form>
-    </div>
+    </div>  
 </body>
 </html>
 
