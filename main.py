@@ -120,15 +120,18 @@ def create_new_item_group(database_file_name, table_name):
 
 def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=None, unique_code=None):
     # Show's all the items within a database. (Inventory database)
+    items = []
     if database_file_name and table_name != None:
         with sqlite3.connect(database_file_name) as connection:
             try:
                 print(f'Displaying all items within this database {database_file_name}')
                 cursor = connection.cursor()
                 all_data = cursor.execute(f"SELECT * from {table_name}")
-                print(all_data.fetchall())
+                items.append(all_data.fetchall())
             except sqlite3.OperationalError:
                 print('Nothing was found')
+
+        return items
     
     elif SKU != None:
         try:
@@ -241,28 +244,35 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
             connection.commit()
         print('Done..')
 
-def total_amount_sku(sku_number=None):
-    total_amount = []
-    database = os.listdir()
-    database.remove('product_information_database.db')
-    for database_name in database:
-        if database_name.endswith('.db'):
-            with sqlite3.connect(database_name) as connection:
-                cursor = connection.cursor()
-                table_names = cursor.execute(""" select name from sqlite_master where type='table';""")
-                results = table_names.fetchall()
-                for table in results:
-                    table_name = table[0]
-                    with sqlite3.connect(database_name) as connection:
-                        cursor = connection.cursor()
-                        data = cursor.execute(f"""select {sku_number} from {table_name}""")
-                        data = data.fetchall()
-                        if data == None or len(data) == 0:
-                            pass
-                        else:
-                            total_amount.append(data)
-    print('We have a total of ' + str(len(total_amount)))
-
+def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, sku=None):
+    if sku_number != None:
+        total_amount = []
+        database = os.listdir()
+        database.remove('product_information_database.db')
+        for database_name in database:
+            if database_name.endswith('.db'):
+                with sqlite3.connect(database_name) as connection:
+                    cursor = connection.cursor()
+                    table_names = cursor.execute(""" select name from sqlite_master where type='table';""")
+                    results = table_names.fetchall()
+                    for table in results:
+                        table_name = table[0]
+                        with sqlite3.connect(database_name) as connection:
+                            cursor = connection.cursor()
+                            data = cursor.execute(f"""select {sku_number} from {table_name}""")
+                            data = data.fetchall()
+                            if data == None or len(data) == 0:
+                                pass
+                            else:
+                                total_amount.append(data)
+        print('Total of ' + str(len(total_amount)))
+        return len(total_amount)
+    
+    elif database_file_name and table_name != None:
+        with sqlite3.connect(database_file_name) as connection:
+            cursor = connection.cursor()
+            all_data = cursor.execute(f"SELECT {sku} from {table_name} where sku={sku}")
+        return len(all_data.fetchall())
 
 def validate_table_name(table_name=None):
     # This should provide a table name and database name
@@ -283,6 +293,4 @@ def validate_table_name(table_name=None):
     return valid_database_name
 
 
-# data = validate_table_name(table_name='hello_inventory')
-# print(data)
-# print(data[0])
+# total_amount_sku(table_name='hello_inventory', database_file_name='hello.db', sku='10034')
