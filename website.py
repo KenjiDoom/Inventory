@@ -67,6 +67,7 @@ def search():
 
 @app.route('/label', methods=['GET', 'POST'])
 def labelpro():
+    # Note label printing is mainly used for Price tags... but these functions can be used for items and databases
     # 1. Update all qr tags in a database or all databases. (Also known as print all the items within a database)
     # 2. Update or generate a specific qr tag for a specific item (using unique_code or sku). 
     # 3. Show avaiable QR tag options
@@ -76,11 +77,9 @@ def labelpro():
             if request.form.get('item_button') == 'item':
                     ID_code = request.form['item_name']
                     data = show_scan_results_for_item(unique_code=ID_code)
-                    # This is giving a None error
                     generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[4], database_file_name=data[5])
-                    total_amount = total_amount_sku(sku_number=data[0])
-                    results = [(data[0], data[1], total_amount, data[3])]
-                    
+                    total_amount_of_skus = total_amount_sku(sku_number=data[0])
+                    results = [(data[0], data[1], str(total_amount_of_skus), data[3])]
                     tr_names = [('Sku', 'Description', 'Total OH', 'ID Code')]
 
                     return render_template('label.html', results=results, tr_names=tr_names)
@@ -88,21 +87,36 @@ def labelpro():
             elif request.form.get('inventory_button') == 'inventory':
                 inventory_name = request.form['item_name']
                 if inventory_name == []:
-                    print('Empty')
                     pass
                 elif inventory_name != []:    
-                    total_amount_sku = []
+                    if ".db" in inventory_name:
+                        result = []
+                        remove_db = inventory_name.find('.db') + 4
+                        table = validate_table_name(table_name=str(inventory_name[remove_db:]), database_file_name=inventory_name[:remove_db - 1])
+                        inventory_data = show_scan_results_for_item(table_name=str(table[0]), database_file_name=str(inventory_name[:remove_db - 1]))
+                        generate_qr_codes_for_database(database=str(inventory_name[:remove_db - 1]), table_name=str(table[0]))
                     
-                    table = validate_table_name(table_name=str(inventory_name))
-                    inventory_data = show_scan_results_for_item(table_name=str(table[1]), database_file_name=str(table[0]))
-                    generate_qr_codes_for_database(database=str(table[0]), table_name=str(table[1]))
+                        for sku in inventory_data:
+                            for i in range(len(inventory_data[0])):
+                                numbers = sku[i][0]
+                                amount = total_amount_sku(sku=numbers, database_file_name=str(inventory_name[:remove_db - 1]), table_name=str(table[0]))
+                                result.append((sku[i][0], sku[i][1], amount, sku[i][3]))
+                        
+                        tr_names = [('Sku', 'Description', 'Total in Inventory', 'ID Code')]
+                        
+                        # Could be the way we are passing data...., we're passing multiple big chunks and not just one...
+                        return render_template('label.html', result=result, tr_names=tr_names)
+                    else:
+                        print('No it doesnt contain a db exntension')
 
-                    tr_names = [('Sku', 'Description', 'Total In Tote', 'ID Code')]
-                    results = inventory_data[0]
                     
-                    return render_template('label.html', results=results, tr_names=tr_names)
+                    #table = validate_table_name(table_name=str(inventory_name))
+                    #inventory_data = show_scan_results_for_item(table_name=str(table[1]), database_file_name=str(table[0]))
+                    #generate_qr_codes_for_database(database=str(table[0]), table_name=str(table[1]))
 
-                    print('Done..')
+                    #tr_names = [('Sku', 'Description', 'Total In Tote', 'ID Code')]
+                    
+                    #return render_template('label.html', results=results, tr_names=tr_names)
         except TypeError as e:
             print(e)
             return render_template('label.html', error_message='Something went wrong...')
@@ -114,4 +128,4 @@ def labelpro():
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
-    app.run(host='192.168.1.81', port=4000)
+    app.run(host='192.168.1.82', port=4000)
