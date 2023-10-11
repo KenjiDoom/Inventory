@@ -267,30 +267,44 @@ def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, 
                                 total_amount.append(data)
         print('Total of ' + str(len(total_amount)))
         return len(total_amount)
-    
     elif database_file_name and table_name != None:
         with sqlite3.connect(database_file_name) as connection:
             cursor = connection.cursor()
             all_data = cursor.execute(f"SELECT {sku} from {table_name} where sku={sku}")
         return len(all_data.fetchall())
 
-def validate_table_name(table_name=None):
+def validate_table_name(table_name=None, database_file_name=None):
     # This should provide a table name and database name
     valid_database_name = []
-    database = os.listdir()
-    for database_name in database:
-        if database_name.endswith('.db'):
-            with sqlite3.connect(database_name) as connection:
+    if table_name != []:
+        if database_file_name != None:
+            print(database_file_name)
+            with sqlite3.connect(database_file_name) as connection:
                 cursor = connection.cursor()
-                table_names = cursor.execute(""" select name from sqlite_master where type='table';""")
-                for table in table_names.fetchall():
-                    if table[0] == table_name:
-                        valid_database_name.append(database_name)
-                        valid_database_name.append(table_name)
-                    else:
-                        pass
-
+                table = cursor.execute(f"""SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';""")
+                print(table.fetchone())
+        if database_file_name == None:
+            database = os.listdir()
+            for database_name in database:
+                if database_name.endswith('.db'):
+                    with sqlite3.connect(database_name) as connection:
+                        cursor = connection.cursor()
+                        table_names = cursor.execute(""" select name from sqlite_master where type='table';""")
+                        for table in table_names.fetchall():
+                            if table[0] == table_name:
+                                valid_database_name.append(database_name)
+                                valid_database_name.append(table_name)
+                                print('if table_name is being ran')
+                            else:
+                                pass
+    
+    print('--------')
+    print(valid_database_name)
     return valid_database_name
 
+
+inventory_name = 'test.db test_inventory'
+remove_db = inventory_name.find('.db') + 4
+validate_table_name(table_name=str(inventory_name[remove_db:]), database_file_name=inventory_name[:remove_db - 1])
 
 # total_amount_sku(table_name='hello_inventory', database_file_name='hello.db', sku='10034')
