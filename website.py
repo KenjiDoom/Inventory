@@ -75,6 +75,7 @@ def labelpro():
     if request.method == 'POST':
         try:
             if request.form.get('item_button') == 'item':
+                # Item press
                     ID_code = request.form['item_name']
                     data = show_scan_results_for_item(unique_code=ID_code)
                     generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[4], database_file_name=data[5])
@@ -85,12 +86,14 @@ def labelpro():
                     return render_template('label.html', results=results, tr_names=tr_names)
             
             elif request.form.get('inventory_button') == 'inventory':
+                # Inventory press
+                result = []
                 inventory_name = request.form['item_name']
                 if inventory_name == []:
                     pass
                 elif inventory_name != []:    
                     if ".db" in inventory_name:
-                        result = []
+                        # Looks for table name and database file name
                         remove_db = inventory_name.find('.db') + 4
                         table = validate_table_name(table_name=str(inventory_name[remove_db:]), database_file_name=inventory_name[:remove_db - 1])
                         inventory_data = show_scan_results_for_item(table_name=str(table[0]), database_file_name=str(inventory_name[:remove_db - 1]))
@@ -102,21 +105,25 @@ def labelpro():
                                 amount = total_amount_sku(sku=numbers, database_file_name=str(inventory_name[:remove_db - 1]), table_name=str(table[0]))
                                 result.append((sku[i][0], sku[i][1], amount, sku[i][3]))
                         
-                        tr_names = [('Sku', 'Description', 'Total in Inventory', 'ID Code')]
+                        tr_names = [('Sku', 'Description', 'Quantity', 'ID Code')]
                         
-                        # Could be the way we are passing data...., we're passing multiple big chunks and not just one...
-                        return render_template('label.html', result=result, tr_names=tr_names)
+                        return render_template('label.html', results=result, tr_names=tr_names)
                     else:
-                        print('No it doesnt contain a db exntension')
+                        # Looks only for table name
+                        table = validate_table_name(table_name=str(inventory_name))
+                        inventory_data = show_scan_results_for_item(table_name=str(table[1]), database_file_name=str(table[0]))
+                        generate_qr_codes_for_database(database=str(table[0]), table_name=str(table[1]))
+                        
+                        for sku in inventory_data:
+                            for i in range(len(inventory_data[0])):
+                                numbers = sku[i][0]
+                                amount = total_amount_sku(sku=numbers, database_file_name=str(table[0]), table_name=str(table[1]))
+                                result.append((sku[i][0], sku[i][1], amount, sku[i][3]))
+                        
+                        tr_names = [('Sku', 'Description', 'Quantity', 'ID Code')]
 
-                    
-                    #table = validate_table_name(table_name=str(inventory_name))
-                    #inventory_data = show_scan_results_for_item(table_name=str(table[1]), database_file_name=str(table[0]))
-                    #generate_qr_codes_for_database(database=str(table[0]), table_name=str(table[1]))
-
-                    #tr_names = [('Sku', 'Description', 'Total In Tote', 'ID Code')]
-                    
-                    #return render_template('label.html', results=results, tr_names=tr_names)
+                        return render_template('label.html', results=result, tr_names=tr_names)
+        
         except TypeError as e:
             print(e)
             return render_template('label.html', error_message='Something went wrong...')
