@@ -44,22 +44,25 @@
         <h1> Inventory </h1>
     </header>
     <nav>
-        <button>Inven Report</button>
+        <button>Inventory Report</button>
         <button onclick="sku_search()">SKU Search</button>
         <button>Register</button>
         <button onclick="label_print()">LabelPro</button>
-        <button>Stock Adjustment</button>
+        <button onclick="item_adjustment()">Item Adjustment</button>
     </nav>
     
     <div style="background-color: #fff; padding: 20px;">
-		<script>
-			function sku_search() {
-				window.open('search', "_self")
-			}
-            function label_print(){
-                window.open('label', "_self")
-            }
-		</script>
+	    <script>
+		    function sku_search() {
+			    indow.open('search', "_self")
+		    }
+		    function label_print(){
+			    window.open('label', "_self")
+		    }
+		    function item_adjustment(){
+			    window.open('moving_item', "_self")
+		    }
+	</script>
     </div>
 
 </body>
