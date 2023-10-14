@@ -63,6 +63,13 @@
             margin-bottom: 20px;
         }
 
+        #result{
+            font-size: 17px;
+            color: rgb(255, 8, 8);
+            padding: 1px;
+            margin-bottom: 20px;
+        }
+
     </style>
 </head>
 <body>
@@ -75,6 +82,13 @@
             {{ error_message }}
         </div>
         {% endif %}
+
+        {% if result %}
+        <div id="result">
+            {{ result }}
+        </div>
+        {% endif %}
+
         <label for="location">Inventory Location:</label>
         <input type="text" id="location" name="inventory_location" required>
         <br>
