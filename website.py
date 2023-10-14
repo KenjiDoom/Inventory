@@ -138,11 +138,14 @@ def moving_item():
     if request.method == 'POST':
         sku_number = request.form['sku']
         inventory = request.form['inventory_location']
-        try:
-            value = inventory.find(' ')
-            copy_item_to_inventory_database(unique_code=sku_number[6:16], destination_filename=inventory[0:value], destination_table_name=inventory[value:].replace(' ', ''))
-        except IndexError as e:
-            return 'Error no item was scanned...' + str(e)
+        value = inventory.find(' ')
+        data = copy_item_to_inventory_database(unique_code=sku_number[6:16], destination_filename=inventory[0:value], destination_table_name=inventory[value:].replace(' ', ''))
+        if data == 'deleted':
+            return render_template('moving_item.html', result='item was moved successfully...')
+        else:
+            return render_template('moving_item.html', error_message='Item not found...')
+
+    return render_template('moving_item.html')
 
     return render_template('moving_item.html')
 
