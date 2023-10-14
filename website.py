@@ -133,6 +133,19 @@ def labelpro():
 
     return render_template('label.html')
 
+@app.route('/moving_item', methods=['GET', 'POST'])
+def moving_item():
+    if request.method == 'POST':
+        sku_number = request.form['sku']
+        inventory = request.form['inventory_location']
+        try:
+            value = inventory.find(' ')
+            copy_item_to_inventory_database(unique_code=sku_number[6:16], destination_filename=inventory[0:value], destination_table_name=inventory[value:].replace(' ', ''))
+        except IndexError as e:
+            return 'Error no item was scanned...' + str(e)
+
+    return render_template('moving_item.html')
+
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
     app.run(host='192.168.1.82', port=4000)
