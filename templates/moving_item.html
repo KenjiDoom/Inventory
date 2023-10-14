@@ -55,6 +55,14 @@
         button[type="submit"]:hover {
             background-color: #333;
         }
+        
+        #error_message {
+            font-size: 17px;
+            color: red;
+            padding: 1px;
+            margin-bottom: 20px;
+        }
+
     </style>
 </head>
 <body>
@@ -62,6 +70,11 @@
         <label for="sku">SKU:</label>
         <input type="text" id="sku" name="sku" required>
         <br>
+        {% if error_message %}
+        <div id="error_message">
+            {{ error_message }}
+        </div>
+        {% endif %}
         <label for="location">Inventory Location:</label>
         <input type="text" id="location" name="inventory_location" required>
         <br>
