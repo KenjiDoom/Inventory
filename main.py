@@ -195,6 +195,7 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
                             cursor.execute(sql_command, {'col1': struct_data[0][0], 'col2': struct_data[0][1], 'col3': struct_data[0][2], 'col4': struct_data[0][3]})
                             connection.commit()
                             delete_items_from_database(unique_code=unique_code, item_and_destination_data=struct_data[1])
+                            return 'deleted'
                     except sqlite3.OperationalError as e:
                         print('Error scanned an item into an item.')
                         print(e)
