@@ -67,23 +67,17 @@ def search():
 
 @app.route('/label', methods=['GET', 'POST'])
 def labelpro():
-    # Note label printing is mainly used for Price tags... but these functions can be used for items and databases
-    # 1. Update all qr tags in a database or all databases. (Also known as print all the items within a database)
-    # 2. Update or generate a specific qr tag for a specific item (using unique_code or sku). 
-    # 3. Show avaiable QR tag options
-    # Idea: Scan SKU or inventory name for generating all the qr tags within that (tote, isle, inventory) (barcode)
     if request.method == 'POST':
         try:
             if request.form.get('item_button') == 'item':
-                # Item press
-                    ID_code = request.form['item_name']
-                    data = show_scan_results_for_item(unique_code=ID_code)
-                    generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[4], database_file_name=data[5])
-                    total_amount_of_skus = total_amount_sku(sku_number=data[0])
-                    results = [(data[0], data[1], str(total_amount_of_skus), data[3])]
-                    tr_names = [('Sku', 'Description', 'Total OH', 'ID Code')]
-
-                    return render_template('label.html', results=results, tr_names=tr_names)
+                ID_code = request.form['item_name']
+                data = show_scan_results_for_item(unique_code=ID_code)
+                generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[4], database_file_name=data[5])
+                total_amount_of_skus = total_amount_sku(sku_number=data[0])
+                results = [(data[0], data[1], str(total_amount_of_skus), data[3])]
+                tr_names = [('Sku', 'Description', 'Total OH', 'ID Code')]
+                
+                return render_template('label.html', results=results, tr_names=tr_names)
             
             elif request.form.get('inventory_button') == 'inventory':
                 # Inventory press
@@ -151,4 +145,4 @@ def moving_item():
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
-    app.run(host='192.168.1.82', port=4000)
+    app.run(host='192.168.1.40', port=4000)
