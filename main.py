@@ -298,14 +298,4 @@ def validate_table_name(table_name=None, database_file_name=None):
                                 print('if table_name is being ran')
                             else:
                                 pass
-    
-    print('--------')
-    print(valid_database_name)
     return valid_database_name
-
-
-inventory_name = 'test.db test_inventory'
-remove_db = inventory_name.find('.db') + 4
-validate_table_name(table_name=str(inventory_name[remove_db:]), database_file_name=inventory_name[:remove_db - 1])
-
-# total_amount_sku(table_name='hello_inventory', database_file_name='hello.db', sku='10034')
