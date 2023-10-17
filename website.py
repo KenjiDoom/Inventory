@@ -49,12 +49,16 @@ def search():
     if request.method == 'POST':
         try:
             sku_number = request.form['sku']
+            print(len(sku_number))
             if len(sku_number) == 5:
                 sku_result = show_scan_results_for_item(SKU=str(sku_number))
-            elif len(sku_number) > 5:
+            elif len(sku_number) == 10:
+                sku_result = show_scan_results_for_item(unique_code=str(sku_number))
+                print(sku_result)
+            elif len(sku_number) == 39:
                 sku_result = show_scan_results_for_item(unique_code=str(sku_number[6:16]))
 
-            if sku_result == None:
+            if sku_result == None:  
                 return render_template('search.html', error_message='Sku was not found...')
             else:
                 results = [(sku_result[0], sku_result[1], sku_result[2])]
