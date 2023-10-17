@@ -1,4 +1,5 @@
 import sqlite3, os, uuid, qrcode
+from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 
 def database_creation(database_name):
@@ -266,6 +267,7 @@ def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, 
                                 pass
                             else:
                                 total_amount.append(data)
+        print(total_amount)
         print('Total of ' + str(len(total_amount)))
         return len(total_amount)
     elif database_file_name and table_name != None:
@@ -273,6 +275,51 @@ def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, 
             cursor = connection.cursor()
             all_data = cursor.execute(f"SELECT {sku} from {table_name} where sku={sku}")
         return len(all_data.fetchall())
+
+def total_amount_warehouse():
+    # This will count all the total items within a warehouse
+    # 1. Get current data to label report 
+    # 2. Get the total amount of items in the entire warehouse        #SKU    #LEFT
+    # 3. Get the total amount per sku, and put them into a dictionary {10045: 20} 
+    # 4. Save the results to a database or json? 
+    # 5. Compare last report data to <-> resent report data
+    #                   yesterday - today = present amount required 
+    current_date = datetime.now()
+    print("Repot gen date : " + str(current_date))
+    total_amount_per_database = []
+    sku_amount = []
+    database = os.listdir()
+    database.remove('product_information_database.db')
+    database.remove('user-data.db')
+    for database_name in database:
+        if database_name.endswith('.db'):
+            with sqlite3.connect('product_information_database.db') as connection:
+                    cursor = connection.cursor()
+                    skus = cursor.execute(""" SELECT SKU FROM product_info """)
+                    skus = skus.fetchall()
+
+            with sqlite3.connect(database_name) as connection:
+                cursor = connection.cursor()
+                table_name = cursor.execute(""" select name from sqlite_master where type='table';""")
+                results = table_name.fetchall()
+                for table in results:
+                    with sqlite3.connect(database_name) as connection:
+                            cursor = connection.cursor()
+                            data = cursor.execute(f"""SELECT * FROM {table[0]}""")
+                            data = data.fetchall()
+                            total_amount_per_database.append(len(data))
+                            for sku in skus:
+                                # what does the program do when it can't find something? 
+                                print(str(sku[0]) + table[0])
+                                sku_grb = cursor.execute(f""" SELECT {sku[0]} from {table[0]}""")
+                                print(sku_grb.fetchone()[0])
+                                sku_amount.append(sku_grb.fetchone()[0])
+    
+    warehouse_total_amount = sum(total_amount_per_database)
+    print(warehouse_total_amount)
+    print(sku_amount)
+    my_dict = {i:sku_amount.count(i) for i in sku_amount}
+    print(my_dict)
 
 def validate_table_name(table_name=None, database_file_name=None):
     # This should provide a table name and database name
@@ -299,3 +346,6 @@ def validate_table_name(table_name=None, database_file_name=None):
                             else:
                                 pass
     return valid_database_name
+
+
+total_amount_warehouse()
