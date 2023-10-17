@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title> Inventory </title>
+    <title>Inventory</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,6 +22,11 @@
             background-color: #000000; /* Red navigation bar background */
         }
 
+        .menu-container {
+            position: relative;
+            display: inline-block;
+        }
+
         nav button {
             display: inline-block;
             padding: 10px 20px;
@@ -34,36 +39,71 @@
             margin: 5px;
         }
 
-        nav button:hover {
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 100%; /* Position below the button */
+            left: 0;
+            background-color: #fff; /* White submenu background */
+            min-width: 160px;
+            z-index: 1;
+        }
+
+        .submenu button {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #000; /* Black submenu button text color */
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .submenu button:hover {
             background-color: #ddd; /* Light gray on hover */
+        }
+
+        .menu-container:hover .submenu {
+            display: block;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1> Inventory </h1>
+        <h1>Inventory</h1>
     </header>
     <nav>
-        <button>Inventory Report</button>
-        <button onclick="sku_search()">SKU Search</button>
         <button>Register</button>
+        <div class="menu-container">
+            <button>Inventory Report</button>
+            <div class="submenu">
+                <button onclick="generateReport('Work-report')">Work-report Report</button>
+                <button onclick="generateReport('Summary')">Summary Report</button>
+            </div>
+        </div>
+        <button onclick="sku_search()">SKU Search</button>
         <button onclick="label_print()">LabelPro</button>
         <button onclick="item_adjustment()">Item Adjustment</button>
     </nav>
     
     <div style="background-color: #fff; padding: 20px;">
-	    <script>
-		    function sku_search() {
-			    indow.open('search', "_self")
-		    }
-		    function label_print(){
-			    window.open('label', "_self")
-		    }
-		    function item_adjustment(){
-			    window.open('moving_item', "_self")
-		    }
-	</script>
-    </div>
+        <script>
+            function sku_search() {
+                window.open('search', '_self');
+            }
 
+            function label_print() {
+                window.open('label', '_self');
+            }
+
+            function item_adjustment() {
+                window.open('moving_item', '_self');
+            }
+
+            function generateReport(reportType) {
+                alert('Generating ' + reportType + ' report');
+            }
+        </script>
+    </div>
 </body>
 </html>
