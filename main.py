@@ -287,10 +287,12 @@ def total_amount_warehouse():
     current_date = datetime.now()
     print("Repot gen date : " + str(current_date))
     total_amount_per_database = []
-    sku_amount = []
+    big_sku_list = []
+    
     database = os.listdir()
     database.remove('product_information_database.db')
     database.remove('user-data.db')
+    
     for database_name in database:
         if database_name.endswith('.db'):
             with sqlite3.connect('product_information_database.db') as connection:
@@ -305,21 +307,17 @@ def total_amount_warehouse():
                 for table in results:
                     with sqlite3.connect(database_name) as connection:
                             cursor = connection.cursor()
-                            data = cursor.execute(f"""SELECT * FROM {table[0]}""")
+                            data = cursor.execute(f"""SELECT SKU FROM {table[0]}""")
                             data = data.fetchall()
                             total_amount_per_database.append(len(data))
-                            for sku in skus:
-                                # what does the program do when it can't find something? 
-                                print(str(sku[0]) + table[0])
-                                sku_grb = cursor.execute(f""" SELECT {sku[0]} from {table[0]}""")
-                                print(sku_grb.fetchone()[0])
-                                sku_amount.append(sku_grb.fetchone()[0])
-    
+                            for sku in data:
+                                big_sku_list.append(str(sku[0]))
+
     warehouse_total_amount = sum(total_amount_per_database)
     print(warehouse_total_amount)
-    print(sku_amount)
-    my_dict = {i:sku_amount.count(i) for i in sku_amount}
-    print(my_dict)
+    
+    sku_total_dict = {sku:big_sku_list.count(sku) for sku in big_sku_list}
+    print(sku_total_dict)
 
 def validate_table_name(table_name=None, database_file_name=None):
     # This should provide a table name and database name
