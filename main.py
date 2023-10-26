@@ -16,7 +16,7 @@ def database_creation(database_name):
                 cursor = connection.cursor()
                 table_name = database_name.replace('.db', '') + '_inventory'
                 generate_qr_codes_for_database(database_name + '.db', table_name)
-                cursor.execute(f"create table {table_name}(SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer)")
+                cursor.execute(f"create table {table_name}(SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer, CAPACITY integer, LOCATION string)")
                 connection.commit()
         except sqlite3.OperationalError:
             print('That file already exist...')
@@ -147,7 +147,7 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
     elif unique_code != None:
         # Locate an item through all database files
         try:
-            exclude_db_names = ['product_information_database.db', 'user-data.db']
+            exclude_db_names = ['user-data.db']
             database = os.listdir() 
             for ex_db in exclude_db_names:
                 try:
@@ -164,17 +164,21 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
                             table_name = table[0]
                             with sqlite3.connect(database_name) as connection:
                                 cursor = connection.cursor()
-                                data = cursor.execute(f"""select {unique_code}, SKU, DESCRIPTION, PRICE from {table_name} WHERE UNIQUE_CODE={unique_code}""")
+                                data = cursor.execute(f"""select {unique_code}, SKU, DESCRIPTION, PRICE, CAPACITY, LOCATION from {table_name} WHERE UNIQUE_CODE={unique_code}""")
                                 data = data.fetchall()
                                 value = len(data)
                                 if data == None or len(data) == 0:
                                     pass
                                 elif data != None:
                                     for i in range(value):
+                                        print(data[i][4], data[i][5])
+                                        print(data[i][1], data[i][2], data[i][3], data[i][0], data[i][4], data[i][5])
                                         return data[i][1], data[i][2], data[i][3], data[i][0], table_name, database_name
         except sqlite3.OperationalError as e:
             print(e)
             print('!! Error must have scanned an inventory qr tag instead of a item. !!')
+
+result = show_scan_results_for_item(unique_code='3236630686')
 
 def copy_item_to_inventory_database(unique_code=None, destination_filename=None, destination_table_name=None):
     # Copy an item into a database
@@ -186,15 +190,19 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
             elif destination_filename != None:
                 if os.path.exists(destination_filename) == True:
                     try:
-                        struct_data = [
+                        struct_data = [ # Chang this
                             (sku_data[0], sku_data[1], sku_data[2], unique_code),
                             (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5], destination_filename, destination_table_name),
                         ]
                         with sqlite3.connect(str(destination_filename)) as connection:
                             cursor = connection.cursor()
-                            sql_command = f"INSERT INTO {destination_table_name} VALUES (:col1, :col2, :col3, :col4)"
+                            
+                            sql_command = f"INSERT INTO {destination_table_name} VALUES (:col1, :col2, :col3, :col4)" # change this
+                                                        # Change this
                             cursor.execute(sql_command, {'col1': struct_data[0][0], 'col2': struct_data[0][1], 'col3': struct_data[0][2], 'col4': struct_data[0][3]})
+                            
                             connection.commit()
+                            # possibly change this
                             delete_items_from_database(unique_code=unique_code, item_and_destination_data=struct_data[1])
                             return 'deleted'
                     except sqlite3.OperationalError as e:
@@ -313,11 +321,19 @@ def total_amount_warehouse():
                             for sku in data:
                                 big_sku_list.append(str(sku[0]))
 
+    # Total amount of items in the entire warehouse
     warehouse_total_amount = sum(total_amount_per_database)
     print(warehouse_total_amount)
     
+    # Total amount of items per sku in the entire warehouse
     sku_total_dict = {sku:big_sku_list.count(sku) for sku in big_sku_list}
     print(sku_total_dict)
+
+    # Calculate How much needs to be replenished using capacity and a percentage of 40%
+    # 1. We need the capacity amount per sku
+    # 2. We need the current amount of items in that sku
+    # ( Future but we will eventually need the total amount in the ware for that sku to prevent - pull report to request more then there actually is )
+    
 
 def validate_table_name(table_name=None, database_file_name=None):
     # This should provide a table name and database name
@@ -346,4 +362,4 @@ def validate_table_name(table_name=None, database_file_name=None):
     return valid_database_name
 
 
-total_amount_warehouse()
+#total_amount_warehouse()
