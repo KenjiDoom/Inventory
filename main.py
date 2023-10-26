@@ -243,14 +243,15 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
     # Also useful for when all items for a specific sku have been deleted.
     with sqlite3.connect('product_information_database.db') as connection:
         cursor = connection.cursor()
-        cursor = cursor.execute(f"SELECT {sku_number}, DESCRIPTION, PRICE from product_info WHERE sku={sku_number}")
+        cursor = cursor.execute(f"SELECT {sku_number}, DESCRIPTION, PRICE, CAPACITY, LOCATION from product_info WHERE sku={sku_number}")
         sku_data = cursor.fetchone()
+        print(sku_data)
         new_modified_data = [
-            (sku_data[0], sku_data[1], sku_data[2], generate_random_uuid())
+            (sku_data[0], sku_data[1], sku_data[2], generate_random_uuid(), sku_data[3], sku_data[4])
         ]
         with sqlite3.connect(str(destination_filename)) as connection:
             cursor = connection.cursor()
-            cursor.executemany(f'INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?)', new_modified_data)
+            cursor.executemany(f'INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?, ?, ?)', new_modified_data)
             connection.commit()
         print('Done..')
 
