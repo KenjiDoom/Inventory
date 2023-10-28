@@ -114,7 +114,7 @@ def create_new_item_group(database_file_name, table_name):
         with sqlite3.connect(database_file_name) as connection:
             cursor = connection.cursor()
             # Table name is the new database name you want to create
-            cursor.execute(f"create table {table_name}(SKU integer, DESCRIPTION text, PRICE integer)")
+            cursor.execute(f"create table {table_name} (SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer, CAPACITY integer, LOCATION string)")
             connection.commit()
     except sqlite3.OperationalError:
         print(f'"{table_name}" already exist...')
@@ -131,7 +131,6 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
                 items.append(all_data.fetchall())
             except sqlite3.OperationalError:
                 print('Nothing was found')
-
         return items
     
     elif SKU != None:
