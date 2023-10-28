@@ -181,7 +181,6 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
 def copy_item_to_inventory_database(unique_code=None, destination_filename=None, destination_table_name=None):
     # Copy an item into a database
     sku_data = show_scan_results_for_item(unique_code=unique_code)
-    print(sku_data)
     try:
         if sku_data[0] != None:
             if destination_filename == None:
@@ -190,10 +189,9 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
                 if os.path.exists(destination_filename) == True:
                     try:
                         struct_data = [
-                            (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5]),
-                            (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5], destination_filename, destination_table_name),
+                            (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5]), 
+                            (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5], sku_data[7], sku_data[6]),
                         ]
-                        print(struct_data)
 
                         with sqlite3.connect(str(destination_filename)) as connection:
                             cursor = connection.cursor()
@@ -201,6 +199,7 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
                             cursor.execute(sql_command, {'col1': struct_data[0][0], 'col2': struct_data[0][1], 'col3': struct_data[0][2], 'col4': struct_data[0][3], 'col5': struct_data[0][4], 'col6':struct_data[0][5]})
                             connection.commit()
                             
+                            # Attempting this
                             delete_items_from_database(unique_code=unique_code, item_and_destination_data=struct_data[1])
                             return 'deleted'
                     except sqlite3.OperationalError as e:
@@ -217,16 +216,20 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
         print('Error item not found...' + str(e))
 
 def delete_items_from_database(unique_code=None, item_and_destination_data=None):
+    print(item_and_destination_data)
+    
     if item_and_destination_data != None:
-        print(item_and_destination_data)
-        with sqlite3.connect(str(item_and_destination_data[5])) as connection:
+        # item_and_destination_data[6] and item_and_destination_data[7] provide the destination the data is being delivered to, we wan the location of where the item is orginally from.
+        with sqlite3.connect(str(item_and_destination_data[6])) as connection:
             cursor = connection.cursor()
-            cursor.execute(f"""DELETE from {str(item_and_destination_data[4])} where unique_code={str(unique_code)}""")
+            cursor.execute(f"""DELETE from {str(item_and_destination_data[7])} where unique_code={str(unique_code)}""")
             print('Deleted.....')
             connection.commit()
     
     elif item_and_destination_data == None:
+        # This also needs to be changed...
         item_data = show_scan_results_for_item(unique_code=unique_code)
+        print(item_data)
         try:
             with sqlite3.connect(str(item_data[5])) as connection:
                 cursor = connection.cursor()
