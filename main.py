@@ -198,8 +198,6 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
                             sql_command = f"INSERT INTO {destination_table_name} VALUES (:col1, :col2, :col3, :col4, :col5, :col6)" 
                             cursor.execute(sql_command, {'col1': struct_data[0][0], 'col2': struct_data[0][1], 'col3': struct_data[0][2], 'col4': struct_data[0][3], 'col5': struct_data[0][4], 'col6':struct_data[0][5]})
                             connection.commit()
-                            
-                            # Attempting this
                             delete_items_from_database(unique_code=unique_code, item_and_destination_data=struct_data[1])
                             return 'deleted'
                     except sqlite3.OperationalError as e:
@@ -215,25 +213,19 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
     except TypeError as e:
         print('Error item not found...' + str(e))
 
-def delete_items_from_database(unique_code=None, item_and_destination_data=None):
-    print(item_and_destination_data)
-    
+def delete_items_from_database(unique_code=None, item_and_destination_data=None):   
     if item_and_destination_data != None:
-        # item_and_destination_data[6] and item_and_destination_data[7] provide the destination the data is being delivered to, we wan the location of where the item is orginally from.
         with sqlite3.connect(str(item_and_destination_data[6])) as connection:
             cursor = connection.cursor()
             cursor.execute(f"""DELETE from {str(item_and_destination_data[7])} where unique_code={str(unique_code)}""")
             print('Deleted.....')
             connection.commit()
-    
     elif item_and_destination_data == None:
-        # This also needs to be changed...
         item_data = show_scan_results_for_item(unique_code=unique_code)
-        print(item_data)
         try:
-            with sqlite3.connect(str(item_data[5])) as connection:
+            with sqlite3.connect(str(item_data[7])) as connection:
                 cursor = connection.cursor()
-                cursor.execute(f"""DELETE from {str(item_data[4])} where unique_code={str(unique_code)}""")
+                cursor.execute(f"""DELETE from {str(item_data[6])} where unique_code={str(unique_code)}""")
                 print('Deleted.....')
                 connection.commit()
         except TypeError as e:
