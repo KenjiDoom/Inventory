@@ -48,7 +48,7 @@ def menu():
         elif user_option == '6':
             database_name = input('Enter inventory name: ')
             tote_name = input('Enter tote/item group name: ')
-            create_new_item_group(database_file_name, tote_name)
+            create_new_item_group(database_file_name=database_name, table_name=tote_name)
         
         elif user_option == '7':
             update_all_qr_tags()
