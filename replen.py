@@ -143,11 +143,20 @@ def replen_pull_report():
             print(str(current_peg_amount[x][0]) + ' is less than ' + str(my_dict2[h][1]))
             print('You need to pull',cap_dict[g][1] - current_peg_amount[x][0], 'from', str(h))
 
-def save_results():
+def save_results(data):
     current_date = date.today()
+    day = str(current_date)
     print("Repot gen date : ", str(current_date))
+    
+    time_info = {'Date': day}
+    print(type(time_info))
+    time_info.update(data)
 
+    json_object = json.dumps(time_info, indent=4)
+    print(json_object)
+    
+OH_amount = total_amount_warehouse()
+save_results(data=OH_amount)
 
-save_results()
 #total_amount_warehouse()
 #replen_pull_report()
