@@ -1,4 +1,5 @@
 from main import *
+from replen.py import *
 
 def menu():
     print('1. Information on a product')
@@ -61,6 +62,9 @@ def menu():
             elif len(item) > int(10):
                 data = show_scan_results_for_item(unique_code=item[6:16])
                 generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[4], database_file_name=data[5])
+        elif user_option == '9':
+            print('Generating report....')
+            replen_pull_report()
     except KeyboardInterrupt:
         print('\nExiting...')
 
