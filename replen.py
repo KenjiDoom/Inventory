@@ -4,8 +4,6 @@ from PIL import Image, ImageDraw, ImageFont
 from deepdiff import DeepDiff
 
 def total_amount_warehouse():
-    current_date = datetime.now()
-    print("Repot gen date : " + str(current_date))
     total_amount_per_database = []
     big_sku_list = []
     
@@ -148,15 +146,16 @@ def save_results(data):
     day = str(current_date)
     print("Repot gen date : ", str(current_date))
     
-    time_info = {'Date': day}
-    print(type(time_info))
-    time_info.update(data)
-
-    json_object = json.dumps(time_info, indent=4)
-    print(json_object)
+    present_data = {'Date': day}
+    present_data.update(data)
+    file_object = json.dumps(present_data, indent=4)
     
+    with open(str(day) +'.json', 'w') as file:
+        file.write(file_object)
+
+# Saving present data to file.
 OH_amount = total_amount_warehouse()
-save_results(data=OH_amount)
+save_results(OH_amount)
 
 #total_amount_warehouse()
 #replen_pull_report()
