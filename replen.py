@@ -1,17 +1,14 @@
-import sqlite3, os, uuid, qrcode
-from datetime import datetime
+import sqlite3, os, uuid, qrcode, json
+from datetime import datetime, date
 from PIL import Image, ImageDraw, ImageFont
 from deepdiff import DeepDiff
 
 def total_amount_warehouse():
-    current_date = datetime.now()
-    print("Repot gen date : " + str(current_date))
     total_amount_per_database = []
     big_sku_list = []
     
     database = os.listdir()
     database.remove('product_information_database.db')
-    database.remove('user-data.db')
     
     for database_name in database:
         if database_name.endswith('.db'):
@@ -35,11 +32,11 @@ def total_amount_warehouse():
 
     # Total amount of items in the entire warehouse
     warehouse_total_amount = sum(total_amount_per_database)
-    print(warehouse_total_amount)
+    print('Total entire amount of items OH: ', str(warehouse_total_amount))
     
     # Total amount of items per sku in the entire warehouse
     sku_total_dict = {sku:big_sku_list.count(sku) for sku in big_sku_list}
-    print(sku_total_dict)
+    return sku_total_dict
 
 def replen_pull_report():
     sku_list = []
@@ -120,7 +117,8 @@ def replen_pull_report():
     print(current_peg_amount)
     print('------------------------------')
     
-    for a, b, c, d in zip(amount_subtracted_warehouse, my_dict2, cap_dict, current_peg_amount):
+    all_amount = total_amount_warehouse()
+    for a, b, c, d, e in zip(amount_subtracted_warehouse, my_dict2, cap_dict, current_peg_amount, all_amount):
         # Is the amount subtracted from the warehouse greter then the percentage quanity amount..
 
         # One thing it's not getting is the zero value
@@ -130,7 +128,7 @@ def replen_pull_report():
             print('Yes ' + str(amount_subtracted_warehouse[a]) + ' is greater then ' + 'Percentage Capactiy: ' + str(my_dict2[b][1]) + ' : Orginal Capacity: ' + str(cap_dict[c][1]))
             print('The current amount in that peg is ' + str(current_peg_amount[d][1]))
             pull_amount = cap_dict[c][1] - current_peg_amount[d][1]
-            print('You need to pull: ' + str(pull_amount) + ' from ' + str(b))
+            print('Total OH:', all_amount[e], 'You need to pull:', str(pull_amount), 'from ' + str(b))
             print('------')
         else:
             print('NOT BEING REPLENISHED BECAUSE')
@@ -141,9 +139,21 @@ def replen_pull_report():
     for x, h, g in zip(current_peg_amount, my_dict2, cap_dict):
         if current_peg_amount[x][0] == 0:
             print(str(current_peg_amount[x][0]) + ' is less than ' + str(my_dict2[h][1]))
-            #print(current_peg_amount[x][0] < my_dict2[h][1])
-            print('You need to pull',cap_dict[g][1] - current_peg_amount[x][0], 'from', cap_dict[g])
+            print('You need to pull',cap_dict[g][1] - current_peg_amount[x][0], 'from', str(h))
 
+def save_results(data):
+    current_date = date.today()
+    day = str(current_date)
+    print("Repot gen date : ", str(current_date))
+    
+    present_data = {'Date': day}
+    present_data.update(data)
+    file_object = json.dumps(present_data, indent=4)
+    
+    with open(str(day) +'.json', 'w') as file:
+        file.write(file_object)
+
+OH_amount = total_amount_warehouse()
+save_results(OH_amount)
 #total_amount_warehouse()
-replen_pull_report()
-
+#replen_pull_report()
