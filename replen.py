@@ -1,7 +1,5 @@
 import sqlite3, os, uuid, qrcode, json
-from datetime import datetime, date
-from PIL import Image, ImageDraw, ImageFont
-from deepdiff import DeepDiff
+from datetime import datetime, date, timedelta
 
 def total_amount_warehouse():
     total_amount_per_database = []
@@ -69,14 +67,25 @@ def replen_pull_report():
     
     # Orginal Day
     print('------ Day 1 report -------')
-    day_1 =  {10034: 5, 40456: 7, 68896: 3}
+    #day_1 =  {10034: 5, 40456: 7, 68896: 3}
+    yesterday_data = read_yesterday()
+    yesterday_data.pop('Date')
+    day_1 = {}
+    for key, value in yesterday_data.items():
+        new_key = int(key)
+        day_1[new_key] = value
     print(day_1)
+    
+    
     print('------ Present day report ----')
     print(total_amount_skus_present_day)
     print('-------------------------------')
     # Calculates how much was substracted, from yesterday's report to today's.
+    
     amount_subtracted_warehouse = {key: day_1[key] - total_amount_skus_present_day.get(key, 0)
                            for key in day_1.keys()}
+    print('Amount subtracted')
+    print(amount_subtracted_warehouse)
 
     # This is adding the capacity next to the current total amount. Total amount of skus and the capactiy amount.
     my_dict2 = {i:[sku_list.count(i), b] for (i, b) in zip(sku_list, cap_list)}
@@ -141,19 +150,41 @@ def replen_pull_report():
             print(str(current_peg_amount[x][0]) + ' is less than ' + str(my_dict2[h][1]))
             print('You need to pull',cap_dict[g][1] - current_peg_amount[x][0], 'from', str(h))
 
+def read_yesterday():
+    print('Collecting yesterdays report...')
+    today_date = date.today()
+    
+    with open('log.json', 'r') as data:
+        data = json.loads(data.read())
+    
+    file_name = data['Last_Report_Date'] + '.json'
+    print(file_name)
+    
+    if os.path.exists('reports/' + str(file_name)):
+        with open('reports/' + str(file_name), 'r') as f:
+            return json.loads(f.read())
+    else:
+        print('pass')
+
 def save_results(data):
     current_date = date.today()
     day = str(current_date)
-    print("Repot gen date : ", str(current_date))
-    
+    present_date_log = {'Last_Report_Date': day}
+
     present_data = {'Date': day}
     present_data.update(data)
     file_object = json.dumps(present_data, indent=4)
     
     with open(str(day) +'.json', 'w') as file:
         file.write(file_object)
+    
+    #What if the user makes makes two of the same reports the same day
+    with open('log.json', 'w') as log:
+        log_json_object = json.dumps(present_date_log, indent=4)
+        log.write(log_json_object)
 
-OH_amount = total_amount_warehouse()
-save_results(OH_amount)
+# OH_amount = total_amount_warehouse()
+# save_results(OH_amount)
+
 #total_amount_warehouse()
-#replen_pull_report()
+replen_pull_report()
