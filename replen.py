@@ -1,4 +1,4 @@
-import sqlite3, os, uuid, qrcode, json
+import sqlite3, os, uuid, qrcode, json, sys
 from datetime import datetime, date, timedelta
 
 def total_amount_warehouse():
@@ -7,6 +7,7 @@ def total_amount_warehouse():
     
     database = os.listdir()
     database.remove('product_information_database.db')
+    database.remove('user-data.db')
     
     for database_name in database:
         if database_name.endswith('.db'):
@@ -43,9 +44,12 @@ def replen_pull_report():
     database = os.listdir()
     
     # Exclude back-end database file
-    database.remove('back-end-store.db')
-    database.remove('product_information_database.db')
-
+    try:
+        database.remove('back-end-store.db')
+        database.remove('product_information_database.db')
+    except ValueError:
+        pass
+    
     for database_name in database:
         if database_name.endswith('.db'):
             with sqlite3.connect(database_name) as connection:
@@ -69,6 +73,8 @@ def replen_pull_report():
     print('------ Day 1 report -------')
     #day_1 =  {10034: 5, 40456: 7, 68896: 3}
     yesterday_data = read_yesterday()
+    print(yesterday_data)
+    # Tis file does not exist... we know that, so why keep running the program?
     yesterday_data.pop('Date')
     day_1 = {}
     for key, value in yesterday_data.items():
@@ -158,13 +164,13 @@ def read_yesterday():
         data = json.loads(data.read())
     
     file_name = data['Last_Report_Date'] + '.json'
-    print(file_name)
     
     if os.path.exists('reports/' + str(file_name)):
         with open('reports/' + str(file_name), 'r') as f:
             return json.loads(f.read())
     else:
-        print('pass')
+        print(str(file_name) + ' was not found...')
+        sys.exit(1)
 
 def save_results(data):
     current_date = date.today()
@@ -183,8 +189,12 @@ def save_results(data):
         log_json_object = json.dumps(present_date_log, indent=4)
         log.write(log_json_object)
 
-# OH_amount = total_amount_warehouse()
-# save_results(OH_amount)
+# Saving the total amount of itmes into a file
+# try:
+#     OH_amount = total_amount_warehouse()
+#     save_results(OH_amount)
+# except ValueError:
+#     print('Product database file not found....')
 
 #total_amount_warehouse()
-replen_pull_report()
+#replen_pull_report()
