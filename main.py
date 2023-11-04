@@ -354,5 +354,53 @@ def validate_table_name(table_name=None, database_file_name=None):
                                 pass
     return valid_database_name
 
+def replen_report():
+    # Full replen code
+    sku_list = []
+    cap_list = []
+    location_list = []
+
+    database = os.listdir()
+    try:
+        database.remove('product_information_database.db')
+        print('Deleted...')
+    except ValueError:
+        pass
+    
+    for database_name in database:
+            if database_name.endswith('.db'):
+                print(database_name)
+                with sqlite3.connect(database_name) as connection:
+                    cursor = connection.cursor()
+                    table_name = cursor.execute(""" SELECT name from sqlite_master where type='table';""")
+                    results = table_name.fetchall()
+                    for table in results:
+                        with sqlite3.connect(database_Name) as connection:
+                            data = cursor.execute(f"""SELECT SKU, Capacity, Location from {str(table[0])}""")
+                            data = data.fetchall()
+                            for sku in data:
+                                sku_list.append(sku[0])
+                                cap_list.append(sku[1])
+                                location_list.append(sku[2])
+
+    cap_dict = {i:[sku_list.count(i), b] for (i, b) in zip(sku_list, cap_list)}
+    total_amount_skus_present_day = {i:sku_list.count(i) for i in sku_list}
+
+    last_report = read_last_report()
+    last_reprot.pop('Date')
+    
+def read_last_report():
+    print('Collecting the last report data...')
+    with open('log.json', 'r') as last_report_date:
+        last_report_date = json.loads(last_report_date.read())
+
+    file_name = last_report_date['Last_Report_Date'] + '.json'
+
+    if os.path.exists('reports/' + str(file_name)):
+        with open('reports/' + str(file_name), 'r') as f:
+            date_retrieved = json.loads(f.read())
+            return date_retrieved
+    else:
+        print('Reports file not found...')
 
 #total_amount_warehouse()
