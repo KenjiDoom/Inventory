@@ -1,5 +1,5 @@
 from main import *
-from replen.py import *
+from replen import *
 
 def menu():
     print('1. Information on a product')
