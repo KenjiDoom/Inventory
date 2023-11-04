@@ -10,6 +10,7 @@ def menu():
     print('6. Create a new sub-location / totes (New database table)')
     print('7. Update all qr tags')
     print('8. Update or generate a specifc sku qr tag')
+    print('9. Generate Report ')
     try:
         user_option = input('Select an option: ')
     
