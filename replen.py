@@ -7,7 +7,7 @@ def total_amount_warehouse():
     
     database = os.listdir()
     database.remove('product_information_database.db')
-    database.remove('user-data.db')
+    #database.remove('user-data.db')
     
     for database_name in database:
         if database_name.endswith('.db'):
@@ -133,6 +133,7 @@ def replen_pull_report():
     print('------------------------------')
     
     all_amount = total_amount_warehouse()
+    save_results(all_amount)
     for a, b, c, d, e in zip(amount_subtracted_warehouse, my_dict2, cap_dict, current_peg_amount, all_amount):
         # Is the amount subtracted from the warehouse greter then the percentage quanity amount..
 
@@ -181,8 +182,14 @@ def save_results(data):
     present_data.update(data)
     file_object = json.dumps(present_data, indent=4)
     
-    with open(str(day) +'.json', 'w') as file:
-        file.write(file_object)
+    if os.path.dirname('reports/'):
+        with open('reports/' + str(day) +'.json', 'w') as file:
+            file.write(file_object)
+    else:
+        print('Creating reports directory')
+        os.mkdir('reports/')
+        with open('reports/' + str(day) +'.json', 'w') as file:
+            file.write(file_object)
     
     #What if the user makes makes two of the same reports the same day
     with open('log.json', 'w') as log:
@@ -190,11 +197,11 @@ def save_results(data):
         log.write(log_json_object)
 
 # Saving the total amount of itmes into a file
-# try:
-#     OH_amount = total_amount_warehouse()
-#     save_results(OH_amount)
-# except ValueError:
-#     print('Product database file not found....')
+#try:
+#    OH_amount = total_amount_warehouse()
+#    save_results(OH_amount)
+#except ValueError:
+#    print('Product database file not found....')
 
 #total_amount_warehouse()
-#replen_pull_report()
+replen_pull_report()
