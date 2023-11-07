@@ -231,8 +231,6 @@ def delete_items_from_database(unique_code=None, item_and_destination_data=None)
             print('Item not found ' + str(e))
 
 def unique_code_modification_and_transfer(sku_number=None, destination_filename=None, destination_table_name=None):
-    # Used for moving orginal data into new inventory locations, with new unique codes. Creating new items and moving them into new inventory locatiins.
-    # Also useful for when all items for a specific sku have been deleted.
     with sqlite3.connect('product_information_database.db') as connection:
         cursor = connection.cursor()
         cursor = cursor.execute(f"SELECT {sku_number}, DESCRIPTION, PRICE, CAPACITY, LOCATION from product_info WHERE sku={sku_number}")
@@ -278,13 +276,6 @@ def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, 
         return len(all_data.fetchall())
 
 def total_amount_warehouse():
-    # This will count all the total items within a warehouse
-    # 1. Get current data to label report 
-    # 2. Get the total amount of items in the entire warehouse        #SKU    #LEFT
-    # 3. Get the total amount per sku, and put them into a dictionary {10045: 20} 
-    # 4. Save the results to a database or json? 
-    # 5. Compare last report data to <-> resent report data
-    #                   yesterday - today = present amount required 
     current_date = datetime.now()
     print("Repot gen date : " + str(current_date))
     total_amount_per_database = []
@@ -320,13 +311,7 @@ def total_amount_warehouse():
     
     # Total amount of items per sku in the entire warehouse
     sku_total_dict = {sku:big_sku_list.count(sku) for sku in big_sku_list}
-    print(sku_total_dict)
-
-    # Calculate How much needs to be replenished using capacity and a percentage of 40%
-    # 1. We need the capacity amount per sku
-    # 2. We need the current amount of items in that sku
-    # ( Future but we will eventually need the total amount in the ware for that sku to prevent - pull report to request more then there actually is )
-    
+    print(sku_total_dict)   
 
 def validate_table_name(table_name=None, database_file_name=None):
     # This should provide a table name and database name
@@ -353,54 +338,5 @@ def validate_table_name(table_name=None, database_file_name=None):
                             else:
                                 pass
     return valid_database_name
-
-def replen_report():
-    # Full replen code
-    sku_list = []
-    cap_list = []
-    location_list = []
-
-    database = os.listdir()
-    try:
-        database.remove('product_information_database.db')
-        print('Deleted...')
-    except ValueError:
-        pass
-    
-    for database_name in database:
-            if database_name.endswith('.db'):
-                print(database_name)
-                with sqlite3.connect(database_name) as connection:
-                    cursor = connection.cursor()
-                    table_name = cursor.execute(""" SELECT name from sqlite_master where type='table';""")
-                    results = table_name.fetchall()
-                    for table in results:
-                        with sqlite3.connect(database_Name) as connection:
-                            data = cursor.execute(f"""SELECT SKU, Capacity, Location from {str(table[0])}""")
-                            data = data.fetchall()
-                            for sku in data:
-                                sku_list.append(sku[0])
-                                cap_list.append(sku[1])
-                                location_list.append(sku[2])
-
-    cap_dict = {i:[sku_list.count(i), b] for (i, b) in zip(sku_list, cap_list)}
-    total_amount_skus_present_day = {i:sku_list.count(i) for i in sku_list}
-
-    last_report = read_last_report()
-    last_reprot.pop('Date')
-    
-def read_last_report():
-    print('Collecting the last report data...')
-    with open('log.json', 'r') as last_report_date:
-        last_report_date = json.loads(last_report_date.read())
-
-    file_name = last_report_date['Last_Report_Date'] + '.json'
-
-    if os.path.exists('reports/' + str(file_name)):
-        with open('reports/' + str(file_name), 'r') as f:
-            date_retrieved = json.loads(f.read())
-            return date_retrieved
-    else:
-        print('Reports file not found...')
 
 #total_amount_warehouse()
