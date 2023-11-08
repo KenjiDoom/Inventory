@@ -126,7 +126,7 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
     # Show's all the items within a database. (Inventory database)
     items = []
     if database_file_name and table_name != None:
-        with sqlite3.connect(database_file_name) as connection:
+        with sqlite3.connect('datahub/' + database_file_name) as connection:
             try:
                 print(f'Displaying all items within this database {database_file_name}')
                 cursor = connection.cursor()
@@ -250,9 +250,10 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
         print('Done..')
 
 def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, sku=None):
+    # Used in website.py
     if sku_number != None:
         total_amount = []
-        database = os.listdir()
+        database = os.listdir('datahub/')
         database.remove('product_information_database.db')
         for database_name in database:
             if database_name.endswith('.db'):
@@ -288,7 +289,7 @@ def validate_table_name(table_name=None, database_file_name=None):
             with sqlite3.connect('datahub/' + database_file_name) as connection:
                 cursor = connection.cursor()
                 table = cursor.execute(f"""SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';""")
-                print(table.fetchone())
+                valid_database_name.append(table.fetchone())
         if database_file_name == None:
             database = os.listdir()
             for database_name in database:
@@ -304,5 +305,3 @@ def validate_table_name(table_name=None, database_file_name=None):
                             else:
                                 pass
     return valid_database_name
-
-total_amount_warehouse()
