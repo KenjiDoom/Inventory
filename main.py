@@ -139,7 +139,7 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
     elif SKU != None:
         try:
             # Provides detailed information about a sku number (item/product)
-            with sqlite3.connect('product_information_database.db') as connection:
+            with sqlite3.connect('datahub/product_information_database.db') as connection:
                 cursor = connection.cursor()
                 sku_data = cursor.execute(f"SELECT {SKU}, DESCRIPTION, PRICE, LOCATION from product_info where sku={SKU}")
                 return sku_data.fetchone()
@@ -182,6 +182,7 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
 
 def copy_item_to_inventory_database(unique_code=None, destination_filename=None, destination_table_name=None):
     # Copy an item into a database
+    # Needs datahub update
     sku_data = show_scan_results_for_item(unique_code=unique_code)
     try:
         if sku_data[0] != None:
@@ -215,8 +216,8 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
     except TypeError as e:
         print('Error item not found...' + str(e))
 
-def delete_items_from_database(unique_code=None, item_and_destination_data=None):   
-    if item_and_destination_data != None:
+def delete_items_from_database(unique_code=None, item_and_destination_data=None):
+    if item_and_destination_data != None: # Needs datahub update
         with sqlite3.connect(str(item_and_destination_data[6])) as connection:
             cursor = connection.cursor()
             cursor.execute(f"""DELETE from {str(item_and_destination_data[7])} where unique_code={str(unique_code)}""")
@@ -225,7 +226,7 @@ def delete_items_from_database(unique_code=None, item_and_destination_data=None)
     elif item_and_destination_data == None:
         item_data = show_scan_results_for_item(unique_code=unique_code)
         try:
-            with sqlite3.connect(str(item_data[7])) as connection:
+            with sqlite3.connect('datahub/' + str(item_data[7])) as connection:
                 cursor = connection.cursor()
                 cursor.execute(f"""DELETE from {str(item_data[6])} where unique_code={str(unique_code)}""")
                 print('Deleted.....')
@@ -234,7 +235,7 @@ def delete_items_from_database(unique_code=None, item_and_destination_data=None)
             print('Item not found ' + str(e))
 
 def unique_code_modification_and_transfer(sku_number=None, destination_filename=None, destination_table_name=None):
-    with sqlite3.connect('product_information_database.db') as connection:
+    with sqlite3.connect('datahub/product_information_database.db') as connection:
         cursor = connection.cursor()
         cursor = cursor.execute(f"SELECT {sku_number}, DESCRIPTION, PRICE, CAPACITY, LOCATION from product_info WHERE sku={sku_number}")
         sku_data = cursor.fetchone()
@@ -242,7 +243,7 @@ def unique_code_modification_and_transfer(sku_number=None, destination_filename=
         new_modified_data = [
             (sku_data[0], sku_data[1], sku_data[2], generate_random_uuid(), sku_data[3], sku_data[4])
         ]
-        with sqlite3.connect(str(destination_filename)) as connection:
+        with sqlite3.connect('datahub/' + str(destination_filename)) as connection:
             cursor = connection.cursor()
             cursor.executemany(f'INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?, ?, ?)', new_modified_data)
             connection.commit()
