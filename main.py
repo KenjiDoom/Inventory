@@ -112,8 +112,9 @@ def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
 def create_new_item_group(database_file_name, table_name):
     # This function is used for creating a new item group. AKA: creating a new table within a database.
     # database representing what area of the store you're inserting this item group into. i.e., stockroom or sales floor.
+    # Might contain fixed values. Sales.db or backend.db
     try:
-        with sqlite3.connect(database_file_name) as connection:
+        with sqlite3.connect('datahub/' + database_file_name) as connection:
             cursor = connection.cursor()
             # Table name is the new database name you want to create
             cursor.execute(f"create table {table_name} (SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer, CAPACITY integer, LOCATION string)")
