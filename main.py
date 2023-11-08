@@ -256,13 +256,13 @@ def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, 
         database.remove('product_information_database.db')
         for database_name in database:
             if database_name.endswith('.db'):
-                with sqlite3.connect(database_name) as connection:
+                with sqlite3.connect('datahub/' + database_name) as connection:
                     cursor = connection.cursor()
                     table_names = cursor.execute(""" select name from sqlite_master where type='table';""")
                     results = table_names.fetchall()
                     for table in results:
                         table_name = table[0]
-                        with sqlite3.connect(database_name) as connection:
+                        with sqlite3.connect('datahub/' + database_name) as connection:
                             cursor = connection.cursor()
                             data = cursor.execute(f"""select {sku_number} from {table_name}""")
                             data = data.fetchall()
@@ -274,48 +274,10 @@ def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, 
         print('Total of ' + str(len(total_amount)))
         return len(total_amount)
     elif database_file_name and table_name != None:
-        with sqlite3.connect(database_file_name) as connection:
+        with sqlite3.connect('datahub/' + database_file_name) as connection:
             cursor = connection.cursor()
             all_data = cursor.execute(f"SELECT {sku} from {table_name} where sku={sku}")
         return len(all_data.fetchall())
-
-def total_amount_warehouse():
-    current_date = datetime.now()
-    print("Repot gen date : " + str(current_date))
-    total_amount_per_database = []
-    big_sku_list = []
-    
-    database = os.listdir()
-    database.remove('product_information_database.db')
-    database.remove('user-data.db')
-    
-    for database_name in database:
-        if database_name.endswith('.db'):
-            with sqlite3.connect('product_information_database.db') as connection:
-                    cursor = connection.cursor()
-                    skus = cursor.execute(""" SELECT SKU FROM product_info """)
-                    skus = skus.fetchall()
-
-            with sqlite3.connect(database_name) as connection:
-                cursor = connection.cursor()
-                table_name = cursor.execute(""" select name from sqlite_master where type='table';""")
-                results = table_name.fetchall()
-                for table in results:
-                    with sqlite3.connect(database_name) as connection:
-                            cursor = connection.cursor()
-                            data = cursor.execute(f"""SELECT SKU FROM {table[0]}""")
-                            data = data.fetchall()
-                            total_amount_per_database.append(len(data))
-                            for sku in data:
-                                big_sku_list.append(str(sku[0]))
-
-    # Total amount of items in the entire warehouse
-    warehouse_total_amount = sum(total_amount_per_database)
-    print(warehouse_total_amount)
-    
-    # Total amount of items per sku in the entire warehouse
-    sku_total_dict = {sku:big_sku_list.count(sku) for sku in big_sku_list}
-    print(sku_total_dict)   
 
 def validate_table_name(table_name=None, database_file_name=None):
     # This should provide a table name and database name
@@ -323,7 +285,7 @@ def validate_table_name(table_name=None, database_file_name=None):
     if table_name != []:
         if database_file_name != None:
             print(database_file_name)
-            with sqlite3.connect(database_file_name) as connection:
+            with sqlite3.connect('datahub/' + database_file_name) as connection:
                 cursor = connection.cursor()
                 table = cursor.execute(f"""SELECT name FROM sqlite_master WHERE type='table' AND name='{table_name}';""")
                 print(table.fetchone())
@@ -331,7 +293,7 @@ def validate_table_name(table_name=None, database_file_name=None):
             database = os.listdir()
             for database_name in database:
                 if database_name.endswith('.db'):
-                    with sqlite3.connect(database_name) as connection:
+                    with sqlite3.connect('datahub/' + database_name) as connection:
                         cursor = connection.cursor()
                         table_names = cursor.execute(""" select name from sqlite_master where type='table';""")
                         for table in table_names.fetchall():
@@ -343,4 +305,4 @@ def validate_table_name(table_name=None, database_file_name=None):
                                 pass
     return valid_database_name
 
-#total_amount_warehouse()
+total_amount_warehouse()
