@@ -3,8 +3,8 @@ from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 
 def database_creation(database_name):
-    if os.path.isfile(database_name):
-        with sqlite3.connect(database_name) as connection:
+    if os.path.isfile('datahub/' + database_name):
+        with sqlite3.connect('datahub/' + database_name) as connection:
             cursor = connection.cursor()
             cursor.execute(f"SELECT * FROM {database_name.replace('.db', '') + '_inventory'}")
             rows = cursor.fetchall()
@@ -12,7 +12,7 @@ def database_creation(database_name):
             print(rows)
     else:
         try:
-            with sqlite3.connect(database_name + '.db') as connection:
+            with sqlite3.connect('datahub/' + database_name + '.db') as connection:
                 cursor = connection.cursor()
                 table_name = database_name.replace('.db', '') + '_inventory'
                 generate_qr_codes_for_database(database_name + '.db', table_name)
