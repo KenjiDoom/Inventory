@@ -71,6 +71,7 @@ def search():
 
 @app.route('/label', methods=['GET', 'POST'])
 def labelpro():
+    # Used for creating QR codes 
     if request.method == 'POST':
         try:
             if request.form.get('item_button') == 'item':
@@ -89,19 +90,20 @@ def labelpro():
                 inventory_name = request.form['item_name']
                 if inventory_name == []:
                     pass
-                elif inventory_name != []:    
+                elif inventory_name != []:   
+                    # THIS NEEDS FIXING. NEEDS TO ACCEPT ONLY THE DATABASE NAME WITHOUT THE .DB EXNTESION OR FULL QR CODE SCAN - UPDATE ME LATER
                     if ".db" in inventory_name:
-                        # Looks for table name and database file name
                         remove_db = inventory_name.find('.db') + 4
-                        table = validate_table_name(table_name=str(inventory_name[remove_db:]), database_file_name=inventory_name[:remove_db - 1])
-                        inventory_data = show_scan_results_for_item(table_name=str(table[0]), database_file_name=str(inventory_name[:remove_db - 1]))
-                        generate_qr_codes_for_database(database=str(inventory_name[:remove_db - 1]), table_name=str(table[0]))
+                        table = validate_table_name(table_name=str(inventory_name[remove_db:]), database_file_name=inventory_name[:remove_db - 1])                       
+                        inventory_data = show_scan_results_for_item(table_name=str(table[0][0]), database_file_name=str(inventory_name[:remove_db - 1]))
+                        print(inventory_data)
+                        generate_qr_codes_for_database(database=str(inventory_name[:remove_db - 1]), table_name=str(table[0][0]))
                     
                         for sku in inventory_data:
-                            for i in range(len(inventory_data[0])):
-                                numbers = sku[i][0]
-                                amount = total_amount_sku(sku=numbers, database_file_name=str(inventory_name[:remove_db - 1]), table_name=str(table[0]))
-                                result.append((sku[i][0], sku[i][1], amount, sku[i][3]))
+                           for i in range(len(inventory_data[0])):
+                            numbers = sku[i][0]
+                            amount = total_amount_sku(sku=numbers, database_file_name=str(inventory_name[:remove_db - 1]), table_name=str(table[0][0]))
+                            result.append((sku[i][0], sku[i][1], amount, sku[i][3]))
                         
                         tr_names = [('Sku', 'Description', 'Quantity', 'ID Code')]
                         
@@ -149,4 +151,4 @@ def moving_item():
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
-    app.run(host='192.168.1.40', port=4000)
+    app.run(host='192.168.1.82', port=4000)
