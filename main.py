@@ -24,16 +24,18 @@ def database_creation(database_name):
 def update_all_qr_tags():
     print('Updating all qr tags with update-to-date locations and information')
     try:
-        exclude_db_names = ['user-data.db']
-        database_name = os.listdir() 
+        exclude_db_names = ['user-data.db', 'product_information_database.db']
+        database_name = os.listdir('datahub')
+
         for ex_db in exclude_db_names:
             try:
                 database_name.remove(ex_db)
             except ValueError:
                 pass
+        
         for database in database_name:
             if database.endswith('.db'):
-                with sqlite3.connect(database) as connection:
+                with sqlite3.connect('datahub/' + str(database)) as connection:
                     cursor = connection.cursor()
                     table_names = cursor.execute("""select name from sqlite_master where type='table';""")
                     results = table_names.fetchall()
@@ -77,11 +79,11 @@ def generate_qr_codes_for_database(database, table_name):
     text_y = img_height - text_height - 10 
     
     font_size = 15
-    font = ImageFont.truetype("DejaVuSans.ttf", size=font_size) 
+    font = ImageFont.truetype("static/fonts/DejaVuSans.ttf", size=font_size) 
     
     draw.text((text_x, text_y), text, fill="black", font=font)
 
-    qr_img.save(database.replace('.db', '') + '_' + table_name + '.png')
+    qr_img.save('datahub/qrcodes-generated/' + database.replace('.db', '') + '_' + table_name + '.png')
 
 def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
     qr = qrcode.QRCode(
@@ -97,7 +99,7 @@ def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
     draw = ImageDraw.Draw(qr_img)
     
     text = str(sku)
-    font = ImageFont.truetype("DejaVuSans.ttf", size=30)
+    font = ImageFont.truetype("static/fonts/DejaVuSans.ttf", size=30)
     
     img_width, img_height = qr_img.size
     text_x = (img_width - 90) // 2
@@ -105,7 +107,7 @@ def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
 
     draw.text((text_x, text_y), text, fill="black", font=font)
 
-    qr_img.save(str(sku) + '_' + str(unique_code) + '.png')
+    qr_img.save('datahub/qrcodes-generated/' + str(sku) + '_' + str(unique_code) + '.png', 'PNG')
 
 def create_new_item_group(database_file_name, table_name):
     # This function is used for creating a new item group. AKA: creating a new table within a database.
@@ -147,7 +149,7 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
         # Locate an item through all database files
         try:
             exclude_db_names = ['user-data.db']
-            database = os.listdir() 
+            database = os.listdir('datahub')
             for ex_db in exclude_db_names:
                 try:
                     database.remove(ex_db)
@@ -155,13 +157,13 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
                     pass                
             for database_name in database:
                 if database_name.endswith('.db'):
-                    with sqlite3.connect(database_name) as connection:
+                    with sqlite3.connect('datahub/' + database_name) as connection:
                         cursor = connection.cursor()
                         table_names = cursor.execute("""select name from sqlite_master where type='table';""")
                         results = table_names.fetchall()
                         for table in results:
                             table_name = table[0]
-                            with sqlite3.connect(database_name) as connection:
+                            with sqlite3.connect('datahub/' + database_name) as connection:
                                 cursor = connection.cursor()
                                 data = cursor.execute(f"""select {unique_code}, SKU, DESCRIPTION, PRICE, CAPACITY, LOCATION from {table_name} WHERE UNIQUE_CODE={unique_code}""")
                                 data = data.fetchall()
