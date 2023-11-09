@@ -189,23 +189,24 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
             if destination_filename == None:
                 pass
             elif destination_filename != None:
-                if os.path.exists(destination_filename) == True:
+                if os.path.exists('datahub/' + destination_filename) == True:
                     try:
                         struct_data = [
                             (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5]), 
                             (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5], sku_data[7], sku_data[6]),
                         ]
-
-                        with sqlite3.connect(str(destination_filename)) as connection:
+                        print(destination_filename, destination_table_name)
+                        with sqlite3.connect('datahub/' + str(destination_filename)) as connection:
                             cursor = connection.cursor()
-                            sql_command = f"INSERT INTO {destination_table_name} VALUES (:col1, :col2, :col3, :col4, :col5, :col6)" 
+                            sql_command = f"INSERT INTO {destination_table_name} VALUES (:col1, :col2, :col3, :col4, :col5, :col6)"
                             cursor.execute(sql_command, {'col1': struct_data[0][0], 'col2': struct_data[0][1], 'col3': struct_data[0][2], 'col4': struct_data[0][3], 'col5': struct_data[0][4], 'col6':struct_data[0][5]})
                             connection.commit()
                             delete_items_from_database(unique_code=unique_code, item_and_destination_data=struct_data[1])
                             return 'deleted'
-                    except sqlite3.OperationalError as e:
-                        print('Error scanned an item into an item.')
-                        print(e)
+                        # Hmmmm..... So it scans the item into the database BUT doesn't delet it. It claims
+                    # except sqlite3.OperationalError as e:
+                    #     print('Error scanned an item into an item.')
+                    #     print(e)
                     except IndexError as e:
                         print('!! Error nothing was scanned. !!')
                         print(e)
@@ -218,7 +219,7 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
 
 def delete_items_from_database(unique_code=None, item_and_destination_data=None):
     if item_and_destination_data != None: # Needs datahub update
-        with sqlite3.connect(str(item_and_destination_data[6])) as connection:
+        with sqlite3.connect('datahub/' + str(item_and_destination_data[6])) as connection:
             cursor = connection.cursor()
             cursor.execute(f"""DELETE from {str(item_and_destination_data[7])} where unique_code={str(unique_code)}""")
             print('Deleted.....')
