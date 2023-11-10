@@ -6,28 +6,31 @@ def total_amount_warehouse():
     big_sku_list = []
     
     database = os.listdir()
-    database.remove('product_information_database.db')
-    #database.remove('user-data.db')
-    
+    try:
+        database.remove('product_information_database.db')
+        database.remove('user-data.db')
+    except ValueError:
+        pass
+
     for database_name in database:
         if database_name.endswith('.db'):
-            with sqlite3.connect('product_information_database.db') as connection:
+            with sqlite3.connect('datahub/product_information_database.db') as connection:
                     cursor = connection.cursor()
                     skus = cursor.execute(""" SELECT SKU FROM product_info """)
                     skus = skus.fetchall()
 
-            with sqlite3.connect(database_name) as connection:
+            with sqlite3.connect('datahub/' + database_name) as connection:
                 cursor = connection.cursor()
                 table_name = cursor.execute(""" select name from sqlite_master where type='table';""")
                 results = table_name.fetchall()
                 for table in results:
-                    with sqlite3.connect(database_name) as connection:
+                    with sqlite3.connect('datahub/ ' + database_name) as connection:
                             cursor = connection.cursor()
                             data = cursor.execute(f"""SELECT SKU FROM {table[0]}""")
                             data = data.fetchall()
                             total_amount_per_database.append(len(data))
                             for sku in data:
-                                big_sku_list.append(str(sku[0]))
+                               big_sku_list.append(str(sku[0]))
 
     # Total amount of items in the entire warehouse
     warehouse_total_amount = sum(total_amount_per_database)
@@ -41,29 +44,29 @@ def replen_pull_report():
     sku_list = []
     cap_list = []
     location_list = []
-    database = os.listdir()
-    
-    # Exclude back-end database file
-    try:
-        database.remove('back-end-store.db')
-        database.remove('product_information_database.db')
-    except ValueError:
-        pass
-    
+    database = os.listdir('datahub/')
+    database.remove('product_information_database.db')
+    database.remove('user-data.db')
+    # Should contain a fixed database list?
     for database_name in database:
         if database_name.endswith('.db'):
-            with sqlite3.connect(database_name) as connection:
+            print(database_name)
+            with sqlite3.connect('datahub/' + database_name) as connection:
                 cursor = connection.cursor()
                 table_name = cursor.execute(""" SELECT name from sqlite_master where type='table';""")
                 results = table_name.fetchall()
                 for table in results:
-                    with sqlite3.connect(database_name) as connection:
-                        data = cursor.execute(f"""SELECT SKU, Capacity, Location from {str(table[0])}""")
-                        data = data.fetchall()
-                        for sku in data:
-                            sku_list.append(sku[0])
-                            cap_list.append(sku[1])
-                            location_list.append(sku[2])
+                    try:
+                        with sqlite3.connect('datahub/' + database_name) as connection:
+                            # It's inlcuding a database, we don't want to be included.
+                            data = cursor.execute(f"""SELECT SKU, Capacity, Location from {str(table[0])}""")
+                            data = data.fetchall()
+                            for sku in data:
+                                sku_list.append(sku[0])
+                                cap_list.append(sku[1])
+                                location_list.append(sku[2])
+                    except sqlite3.OperationalError:
+                        pass
 
     # Orginal data before...
     cap_dict = {i:[sku_list.count(i), b] for (i, b) in zip(sku_list, cap_list)}
@@ -101,7 +104,7 @@ def replen_pull_report():
     zeroed_out_skus = list(diff)
     if zeroed_out_skus != None:
         for sku in zeroed_out_skus:
-            with sqlite3.connect('product_information_database.db') as connection:
+            with sqlite3.connect('datahub/product_information_database.db') as connection:
                 cur = connection.cursor()
                 fix_missing = cur.execute(f""" SELECT SKU, CAPACITY from product_info where SKU={sku}""")
                 number_data = fix_missing.fetchone()
@@ -161,13 +164,13 @@ def read_yesterday():
     print('Collecting yesterdays report...')
     today_date = date.today()
     
-    with open('log.json', 'r') as data:
+    with open('datahub/log.json', 'r') as data:
         data = json.loads(data.read())
     
     file_name = data['Last_Report_Date'] + '.json'
     
-    if os.path.exists('reports/' + str(file_name)):
-        with open('reports/' + str(file_name), 'r') as f:
+    if os.path.exists('datahub/reports/' + str(file_name)):
+        with open('datahub/reports/' + str(file_name), 'r') as f:
             return json.loads(f.read())
     else:
         print(str(file_name) + ' was not found...')
@@ -182,19 +185,23 @@ def save_results(data):
     present_data.update(data)
     file_object = json.dumps(present_data, indent=4)
     
-    if os.path.dirname('reports/'):
-        with open('reports/' + str(day) +'.json', 'w') as file:
+    if os.path.dirname('datahub/reports/'):
+        with open('datahub/reports/' + str(day) +'.json', 'w') as file:
             file.write(file_object)
     else:
         print('Creating reports directory')
-        os.mkdir('reports/')
-        with open('reports/' + str(day) +'.json', 'w') as file:
+        os.mkdir('datahub/reports/')
+        with open('datahub/reports/' + str(day) +'.json', 'w') as file:
             file.write(file_object)
     
     #What if the user makes makes two of the same reports the same day
-    with open('log.json', 'w') as log:
-        log_json_object = json.dumps(present_date_log, indent=4)
-        log.write(log_json_object)
+    option = input('Update last reported to present date Y/N: ')
+    if option.upper() == 'Y':
+        with open('datahub/log.json', 'w') as log:
+            log_json_object = json.dumps(present_date_log, indent=4)
+            log.write(log_json_object)
+    elif option.upper() == 'N':
+        print('Not updating present date in log file...')
 
 # Saving the total amount of itmes into a file
 #try:
@@ -204,4 +211,4 @@ def save_results(data):
 #    print('Product database file not found....')
 
 #total_amount_warehouse()
-replen_pull_report()
+#replen_pull_report()
