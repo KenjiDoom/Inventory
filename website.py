@@ -149,6 +149,14 @@ def moving_item():
 
     return render_template('moving_item.html')
 
+@app.route('/report_summary', methods=['GET', 'POST'])
+def report_summary():
+    return render_template('label.html')
+
+@app.route('/work_report', methods=['GET', 'POST'])
+def work_report():
+    return redner_template('moving_item.html')
+
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
     app.run(host='192.168.1.82', port=4000)
