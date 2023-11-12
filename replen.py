@@ -1,36 +1,30 @@
 import sqlite3, os, uuid, qrcode, json, sys
 from datetime import datetime, date, timedelta
 
-def total_amount_warehouse():
+def total_amount_warehouse(data_removed_name=None):
     total_amount_per_database = []
     big_sku_list = []
     
-    database = os.listdir()
+    database = os.listdir('datahub/')
     try:
         database.remove('product_information_database.db')
         database.remove('user-data.db')
+        database.remove(str(data_removed_name))
     except ValueError:
         pass
-
+   
     for database_name in database:
         if database_name.endswith('.db'):
-            with sqlite3.connect('datahub/product_information_database.db') as connection:
-                    cursor = connection.cursor()
-                    skus = cursor.execute(""" SELECT SKU FROM product_info """)
-                    skus = skus.fetchall()
-
             with sqlite3.connect('datahub/' + database_name) as connection:
                 cursor = connection.cursor()
                 table_name = cursor.execute(""" select name from sqlite_master where type='table';""")
                 results = table_name.fetchall()
                 for table in results:
-                    with sqlite3.connect('datahub/ ' + database_name) as connection:
-                            cursor = connection.cursor()
-                            data = cursor.execute(f"""SELECT SKU FROM {table[0]}""")
-                            data = data.fetchall()
-                            total_amount_per_database.append(len(data))
-                            for sku in data:
-                               big_sku_list.append(str(sku[0]))
+                    data = cursor.execute(f""" SELECT SKU FROM {table[0]}""")
+                    data = data.fetchall()
+                    total_amount_per_database.append(len(data))
+                    for sku in data:
+                        big_sku_list.append(str(sku[0]))
 
     # Total amount of items in the entire warehouse
     warehouse_total_amount = sum(total_amount_per_database)
@@ -44,9 +38,11 @@ def replen_pull_report():
     sku_list = []
     cap_list = []
     location_list = []
+    
     database = os.listdir('datahub/')
     database.remove('product_information_database.db')
     database.remove('user-data.db')
+
     # Should contain a fixed database list?
     for database_name in database:
         if database_name.endswith('.db'):
@@ -135,7 +131,8 @@ def replen_pull_report():
     print(current_peg_amount)
     print('------------------------------')
     
-    all_amount = total_amount_warehouse()
+    # Removing back_endwarehouse.db fixed file
+    all_amount = total_amount_warehouse(data_removed_name='backend_warehouse.db')
     save_results(all_amount)
     for a, b, c, d, e in zip(amount_subtracted_warehouse, my_dict2, cap_dict, current_peg_amount, all_amount):
         # Is the amount subtracted from the warehouse greter then the percentage quanity amount..
@@ -155,10 +152,12 @@ def replen_pull_report():
             print('----------------------------')
     
     # Whenever there is an inocrrect number of items in one dict, this whole program won't work.
+    # This needs to contain a return statement, so that it's able to be grabbed from the website.py
     for x, h, g in zip(current_peg_amount, my_dict2, cap_dict):
         if current_peg_amount[x][0] == 0:
             print(str(current_peg_amount[x][0]) + ' is less than ' + str(my_dict2[h][1]))
-            print('You need to pull',cap_dict[g][1] - current_peg_amount[x][0], 'from', str(h))
+            print('You need to pull', cap_dict[g][1] - current_peg_amount[x][0], 'from', str(h))
+            
 
 def read_yesterday():
     print('Collecting yesterdays report...')
@@ -194,7 +193,6 @@ def save_results(data):
         with open('datahub/reports/' + str(day) +'.json', 'w') as file:
             file.write(file_object)
     
-    #What if the user makes makes two of the same reports the same day
     option = input('Update last reported to present date Y/N: ')
     if option.upper() == 'Y':
         with open('datahub/log.json', 'w') as log:
@@ -203,12 +201,4 @@ def save_results(data):
     elif option.upper() == 'N':
         print('Not updating present date in log file...')
 
-# Saving the total amount of itmes into a file
-#try:
-#    OH_amount = total_amount_warehouse()
-#    save_results(OH_amount)
-#except ValueError:
-#    print('Product database file not found....')
-
-#total_amount_warehouse()
-#replen_pull_report()
+replen_pull_report()
