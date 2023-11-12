@@ -9,14 +9,14 @@ app = Flask(__name__)
 def login():
     if request.method == 'POST':
         def user_database_validation():
-            if os.path.exists('user-data.db') == True:
+            if os.path.exists('datahub/user-data.db') == True:
                 return True
             else:
                 return 'Back-end database not found...'
         
         try:
-            if os.path.exists('user-data.db'):
-                with sqlite3.connect('user-data.db') as connection:
+            if os.path.exists('datahub/user-data.db'):
+                with sqlite3.connect('datahub/user-data.db') as connection:
                     cursor = connection.cursor()
 
                     store_number = request.form['storeNumber']
