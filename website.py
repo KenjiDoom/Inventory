@@ -149,9 +149,25 @@ def moving_item():
 
     return render_template('moving_item.html')
 
+
+# practice data....
+sample_data = {
+    'products': [
+        {'SKU': 10034, 'name': 'Product 1', 'quantity': 10},
+        {'SKU': 40456, 'name': 'Product 2', 'quantity': 20},
+        {'SKU': 68896, 'name': 'Product 3', 'quantity': 15},
+    ],
+}
+
+# Would also run replen script
 @app.route('/report_summary', methods=['GET', 'POST'])
 def report_summary():
-    return render_template('label.html')
+    return render_template('report_summary.html', data=sample_data)
+
+@app.route('/IDSearch/<sku>')
+def id_search(sku):
+    unique_ids_data = search_skus_and_unique_ids(sku)
+    return 'The sku number is: ' + str(unique_ids_data)
 
 @app.route('/work_report', methods=['GET', 'POST'])
 def work_report():
