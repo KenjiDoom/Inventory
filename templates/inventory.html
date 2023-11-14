@@ -99,9 +99,14 @@
             function item_adjustment() {
                 window.open('moving_item', '_self');
             }
-
+            /* Generate report here */
             function generateReport(reportType) {
-                alert('Generating ' + reportType + ' report');
+                if (reportType == 'Summary'){
+                    window.open('report_summary', '_self');
+                }
+                if (reportType == 'work_report'){
+                    window.open('work_report', '_self');
+                }
             }
         </script>
     </div>

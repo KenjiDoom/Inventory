@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replen Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        <h1>Replen Summary</h1>
+    </header>
+    
+    <div class="container">
+        <h2>Products</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Description</th>
+                    <th>Location</th>
+                    <th>OH</th>
+                    <th>Restock Qty</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in data['products'] %}
+                    <tr>
+                        <td class="sku" onclick="openDetailsWindow('{{ product['SKU'] }}')">{{ product['SKU'] }}</td>
+                        <td>{{ product['name'] }}</td>
+                        <td>{{ product['quantity'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function openDetailsWindow(sku) {
+            // Replace this with a custom URL
+            // We can pass the SKU number thru here
+            var detailsUrl = 'IDSearch/' + sku;
+
+            // Open a new window or tab
+            window.open(detailsUrl, '_blank', 'width=600,height=400');
+        }
+    </script>
+</body>
+</html>
