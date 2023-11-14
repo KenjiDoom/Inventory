@@ -306,3 +306,25 @@ def validate_table_name(table_name=None, database_file_name=None):
                             else:
                                 pass
     return valid_database_name
+
+def search_skus_and_unique_ids(sku_number):
+    # We all grepping all database files for 
+    exclude_db_names = ['user-data.db', 'product_information_database.db']
+    database = os.listdir('datahub')
+    for ex_db in exclude_db_names:
+        try:
+            database.remove(ex_db)
+        except ValueError:
+            pass
+    
+    for database_name in database:
+        if database_name.endswith('.db'):
+            with sqlite3.connect('datahub/' + database_name) as connection:
+                cursor = connection.cursor()
+                table_names = cursor.execute(""" SELECT name from sqlite_master where type='table'; """)
+                results = table_names.fetchall()
+                for table in results:
+                    table_name = table[0]
+                    unique_id_query = cursor.execute(f""" SELECT SKU, UNIQUE_CODE, LOCATION from {table[0]} where SKU={sku_number} """)
+                    unique_ids = unique_id_query.fetchall()
+                    return unique_ids  
