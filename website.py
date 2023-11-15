@@ -167,7 +167,7 @@ def report_summary():
 @app.route('/IDSearch/<sku>')
 def id_search(sku):
     unique_ids_data = search_skus_and_unique_ids(sku)
-    return 'The sku number is: ' + str(unique_ids_data)
+    return render_template('id_locations.html', unique_numbers=unique_ids_data, sku_number=sku)
 
 @app.route('/work_report', methods=['GET', 'POST'])
 def work_report():
