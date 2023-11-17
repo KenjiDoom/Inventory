@@ -328,3 +328,13 @@ def search_skus_and_unique_ids(sku_number):
                     unique_id_query = cursor.execute(f""" SELECT SKU, UNIQUE_CODE, LOCATION from {table[0]} where SKU={sku_number} """)
                     unique_ids = unique_id_query.fetchall()
                     return unique_ids  
+
+def sku_search(sku_number):
+    location_list = []
+    description_list = []
+    with sqlite3.connect('datahub/product_information_database.db') as connection:
+        cursor = connection.cursor()
+        information_data = cursor.execute(f"""SELECT SKU, DESCRIPTION, LOCATION from product_info where sku={sku_number}""")
+        information_data = information_data.fetchall()
+   
+    return information_data
