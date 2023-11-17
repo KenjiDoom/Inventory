@@ -151,24 +151,25 @@ def moving_item():
 
 @app.route('/report_summary', methods=['GET', 'POST'])
 def report_summary():
+    # This function should be used for other areas of our program. It's well written...
     results = []
     replen_data = replen_pull_report()
-    
-    print('----------------')
-    
+        
     for key, value in replen_data.items(): 
         oh_number = sku_total_amount(sku_number=key)
-        print(key, oh_number, value)
+        sku_search_results = sku_search(sku_number=key)
         
         sku_summary = {
             'SKU': key,
+            'Description': sku_search_results[0][1],
+            'Location': sku_search_results[0][2],
             'OH': oh_number,
             'Restock QTY': value
         }
         
         # Append the dictionary to the results list
         results.append(sku_summary)
-    print(results)
+
     return render_template('report_summary.html', data=results)
 
 @app.route('/IDSearch/<sku>')
