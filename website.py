@@ -149,20 +149,27 @@ def moving_item():
 
     return render_template('moving_item.html')
 
-
-# practice data....
-sample_data = {
-    'products': [
-        {'SKU': 10034, 'name': 'Product 1', 'quantity': 10},
-        {'SKU': 40456, 'name': 'Product 2', 'quantity': 20},
-        {'SKU': 68896, 'name': 'Product 3', 'quantity': 15},
-    ],
-}
-
-# Would also run replen script
 @app.route('/report_summary', methods=['GET', 'POST'])
 def report_summary():
-    return render_template('report_summary.html', data=sample_data)
+    results = []
+    replen_data = replen_pull_report()
+    
+    print('----------------')
+    
+    for key, value in replen_data.items(): 
+        oh_number = sku_total_amount(sku_number=key)
+        print(key, oh_number, value)
+        
+        sku_summary = {
+            'SKU': key,
+            'OH': oh_number,
+            'Restock QTY': value
+        }
+        
+        # Append the dictionary to the results list
+        results.append(sku_summary)
+    print(results)
+    return render_template('report_summary.html', data=results)
 
 @app.route('/IDSearch/<sku>')
 def id_search(sku):
