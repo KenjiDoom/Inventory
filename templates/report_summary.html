@@ -54,18 +54,16 @@
             <thead>
                 <tr>
                     <th>SKU</th>
-                    <th>Description</th>
-                    <th>Location</th>
                     <th>OH</th>
                     <th>Restock Qty</th>
                 </tr>
             </thead>
             <tbody>
-                {% for product in data['products'] %}
+                {% for product in data %}
                     <tr>
                         <td class="sku" onclick="openDetailsWindow('{{ product['SKU'] }}')">{{ product['SKU'] }}</td>
-                        <td>{{ product['name'] }}</td>
-                        <td>{{ product['quantity'] }}</td>
+                        <td>{{ product['OH'] }}</td>
+                        <td>{{ product['Restock QTY'] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
