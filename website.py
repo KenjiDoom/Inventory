@@ -181,6 +181,10 @@ def id_search(sku):
 def work_report():
     return redner_template('moving_item.html')
 
+@app.route('/save_replen', methods=['POST'])
+def save_replen():
+    return 'Saving Replen'
+
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
     app.run(host='192.168.1.82', port=4000)
