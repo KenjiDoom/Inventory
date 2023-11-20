@@ -133,7 +133,6 @@ def replen_pull_report():
     
     # Removing back_endwarehouse.db fixed file
     all_amount = total_amount_warehouse(data_removed_name='backend_warehouse.db')
-    save_results(all_amount)
     for a, b, c, d, e in zip(amount_subtracted_warehouse, my_dict2, cap_dict, current_peg_amount, all_amount):
         # Is the amount subtracted from the warehouse greter then the percentage quanity amount..
 
@@ -193,12 +192,9 @@ def save_results(data):
         with open('datahub/reports/' + str(day) +'.json', 'w') as file:
             file.write(file_object)
     
-    option = input('Update last reported to present date Y/N: ')
-    if option.upper() == 'Y':
-        with open('datahub/log.json', 'w') as log:
-            log_json_object = json.dumps(present_date_log, indent=4)
-            log.write(log_json_object)
-    elif option.upper() == 'N':
-        print('Not updating present date in log file...')
+    print('Updating log.json file')
+    with open('datahub/log.json', 'w') as log:
+        log_json_object = json.dumps(present_date_log, indent=4)
+        log.write(log_json_object)
 
 replen_pull_report()
