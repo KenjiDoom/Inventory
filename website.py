@@ -183,7 +183,9 @@ def work_report():
 
 @app.route('/save_replen', methods=['POST'])
 def save_replen():
-    return 'Saving Replen'
+    all_amount = total_amount_warehouse(data_removed_name='backend_warehouse.db')
+    save_results(all_amount)
+    return 'saving results..'
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
