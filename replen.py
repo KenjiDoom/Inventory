@@ -196,5 +196,3 @@ def save_results(data):
     with open('datahub/log.json', 'w') as log:
         log_json_object = json.dumps(present_date_log, indent=4)
         log.write(log_json_object)
-
-replen_pull_report()
