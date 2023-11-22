@@ -185,7 +185,7 @@ def work_report():
 def save_replen():
     all_amount = total_amount_warehouse(data_removed_name='backend_warehouse.db')
     save_results(all_amount)
-    return 'saving results..'
+    return render_template('report_summary.html')
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
