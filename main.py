@@ -338,3 +338,25 @@ def sku_search(sku_number):
         information_data = information_data.fetchall()
    
     return information_data
+
+def sku_total_amount(sku_number):
+    # Remake of total_amount_sku, because I don't want to break things for now but this should be considered duplicate code.
+    database = os.listdir('datahub/')
+    sku_list = []
+    try:
+        database.remove('product_information_database.db')
+        database.remove('user-data.db')
+    except ValueError:
+        pass
+    for database_name in database:
+        if database_name.endswith('.db'):
+            with sqlite3.connect('datahub/' + str(database_name)) as connection:
+                cursor = connection.cursor()
+                table_name = cursor.execute(""" select name from sqlite_master where type='table';""")
+                results = table_name.fetchall()
+                for table in results:
+                    data = cursor.execute(f""" select SKU from {table[0]} where SKU={sku_number}""")
+                    data = data.fetchall()
+                    for sku in data:
+                        sku_list.append(sku)
+    return len(sku_list)
