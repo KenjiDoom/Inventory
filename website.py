@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3, socket
+from replen import *
 from main import *
 
 app = Flask(__name__)
@@ -154,7 +155,6 @@ def report_summary():
     # This function should be used for other areas of our program. It's well written...
     results = []
     replen_data = replen_pull_report()
-        
     for key, value in replen_data.items(): 
         oh_number = sku_total_amount(sku_number=key)
         sku_search_results = sku_search(sku_number=key)
