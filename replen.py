@@ -38,6 +38,7 @@ def replen_pull_report():
     sku_list = []
     cap_list = []
     location_list = []
+    website_dictionary = {}
     
     database = os.listdir('datahub/')
     database.remove('product_information_database.db')
@@ -144,6 +145,7 @@ def replen_pull_report():
             print('The current amount in that peg is ' + str(current_peg_amount[d][1]))
             pull_amount = cap_dict[c][1] - current_peg_amount[d][1]
             print('Total OH:', all_amount[e], 'You need to pull:', str(pull_amount), 'from ' + str(b))
+            website_dictionary.update({b: pull_amount})
             print('------')
         else:
             print('NOT BEING REPLENISHED BECAUSE')
@@ -156,7 +158,9 @@ def replen_pull_report():
         if current_peg_amount[x][0] == 0:
             print(str(current_peg_amount[x][0]) + ' is less than ' + str(my_dict2[h][1]))
             print('You need to pull', cap_dict[g][1] - current_peg_amount[x][0], 'from', str(h))
-            
+            website_dictionary.update({h: cap_dict[g][1] - current_peg_amount[x][0]})
+    
+    return website_dictionary
 
 def read_yesterday():
     print('Collecting yesterdays report...')
