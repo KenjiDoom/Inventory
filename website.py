@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect
 import sqlite3, socket
 from replen import *
 from main import *
-
+from search_sku_image import *
 app = Flask(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
@@ -62,8 +62,11 @@ def search():
             if sku_result == None:  
                 return render_template('search.html', error_message='Sku was not found...')
             else:
-                results = [(sku_result[0], sku_result[1], sku_result[2])]
-                return render_template('search.html', results=results)
+                totoal_OH = sku_total_amount(sku_number=str(sku_result[0]))
+                description = sku_search(sku_number=sku_result[0])
+                results = [(sku_result[0], sku_result[1], sku_result[2], totoal_OH, description[0][2])]
+                image = search_for_sku_image_file(sku=str(sku_result[0]))
+                return render_template('search.html', results=results, image_file_name=str(image))
         
         except UnboundLocalError:
             return render_template('search.html', error_message='Sku was not found...')
