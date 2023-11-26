@@ -1,4 +1,4 @@
-import sqlite3, os, uuid, qrcode
+import sqlite3, os, uuid, qrcode, json
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 
@@ -360,3 +360,8 @@ def sku_total_amount(sku_number):
                     for sku in data:
                         sku_list.append(sku)
     return len(sku_list)
+
+def search_for_sku_image_file(sku):
+    with open('sku_image_locations.json', 'r') as f:
+        data = json.loads(f.read())
+        return data[sku]
