@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKU Search</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
 
         .container {
@@ -20,27 +22,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
 
         .search-form {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         input[type="text"] {
-            padding: 10px;
-            font-size: 35px;
+            padding: 12px;
+            font-size: 16px;
             border: 1px solid #ccc;
-            border-radius: 1px;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #ccccd2;
+            border-radius: 4px;
+            width: 70%;
+            margin-right: 10px;
+            box-sizing: border-box;
         }
 
         button {
-            padding: 10px 20px;
-            font-size: 35px;
+            padding: 12px 20px;
+            font-size: 16px;
             background-color: #1f1f20;
             color: #fff;
             border: none;
@@ -53,51 +57,52 @@
         }
 
         .h1 {
-            font-size: 35px;
+            font-size: 30px;
+            margin-bottom: 10px;
         }
 
         .content {
             display: flex;
             align-items: flex-start;
+            flex-wrap: wrap;
         }
 
         table {
-            width: 50%;
-            margin-left: 50px;
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
         }
 
         th, td {
-            border: 1px solid #dddddd;
-            text-align: center;
-            padding: 8px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
         }
 
         th {
-            font-size: 15px;
+            background-color: #1f1f20;
+            color: #fff;
         }
 
-        td {
-            font-size: 15px;
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
 
         #image {
-            float: left;
-            align-items: center;
-            border: 1px solid #cecece;
+            flex: 1;
+            margin-right: 20px;
         }
 
         #image img {
-            max-width: 40%;
-            max-height: 40%;
+            max-width: 100%;
+            height: 200px;
+            border-radius: 8px;
         }
 
         #error_message {
-            font-size: 20px;
+            font-size: 18px;
             color: red;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -116,11 +121,9 @@
         {% endif %}
         
         <div class="content">
-            <!-- Image goes here using slicing once we implement images to our database-->
-            <!-- Or using static -->
+            <!-- Image needs to be dynamic, meaning a value needs to be returned from the results -->
             <div id="image">
-                <img src="{{url_for('static', filename='head.png')}}" align="center" />
-                <!-- You may need to adjust the image source based on your data -->
+                <img src="{{ image_file_name }}">
             </div>
 
             <!-- Display search results here in this table -->
@@ -137,6 +140,8 @@
                     <td>{{ result[0] }}</td>
                     <td>{{ result[1] }}</td> 
                     <td>{{ result[2] }}</td> 
+                    <td>{{ result[3] }}</td>
+                    <td>{{ result[4] }}</td>
                 </tr>
                 {% endfor %}
             </table>
