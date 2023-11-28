@@ -184,9 +184,12 @@ def work_report():
 
 @app.route('/save_replen', methods=['POST'])
 def save_replen():
+    # This functions runs when save replen button is clicked.
     all_amount = total_amount_warehouse(data_removed_name='backend_warehouse.db')
-    save_results(all_amount)
-    return render_template('report_summary.html')
+    re_data = replen_pull_report()
+    save_results(data=all_amount, replen_data=re_data)
+
+    return render_template('report_summary_saved_results.html', saved_message='Results have been saved!')
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
