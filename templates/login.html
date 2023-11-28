@@ -28,11 +28,24 @@
             border-radius: 3px;
             margin-bottom: 10px;
         }
+        .button{
+            background-color: #000000; 
+            color: #fff; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 3px; 
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color:#ff0000;
+            transition: 0.7s;
+        }
+
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2 style="font-size: 24px; margin-bottom: 20px; color: #e62e00;">Inventory System</h2>
+        <h2 style="font-size: 24px; margin-bottom: 20px; color: #000000;">Inventory System</h2>
         
         {% if error_message %}
         <!-- Error Message -->
@@ -43,19 +56,19 @@
         
         <form method="POST" action="/login">
             <div class="input-group">
-                <label for="storeNumber" style="display: block; font-weight: bold; margin-bottom: 5px; color: #0047ab;">Store Number:</label>
+                <label for="storeNumber" style="display: block; font-weight: bold; margin-bottom: 5px; color: #000000;">Store Number:</label>
                 <input type="text" id="storeNumber" name="storeNumber" required style="width: 100%; padding: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 3px; font-size: 14px;">
             </div>
             <div class="input-group">
-                <label for="username" style="display: block; font-weight: bold; margin-bottom: 5px; color: #0047ab;">Username:</label>
+                <label for="username" style="display: block; font-weight: bold; margin-bottom: 5px; color: #000000;">Username:</label>
                 <input type="text" id="username" name="username" required style="width: 100%; padding: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 3px; font-size: 14px;">
             </div>
             <div class="input-group">
-                <label for="password" style="display: block; font-weight: bold; margin-bottom: 5px; color: #0047ab;">Password:</label>
+                <label for="password" style="display: block; font-weight: bold; margin-bottom: 5px; color: #000000;">Password:</label>
                 <input type="password" id="password" name="password" required style="width: 100%; padding: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 3px; font-size: 14px;">
             </div>
             <div class="input-group">
-                <input type="submit" value="Login" style="background-color: #e62e00; color: #fff; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer;">
+                <input type="submit" class="button" value="Login"">
             </div>
         </form>
     </div>
