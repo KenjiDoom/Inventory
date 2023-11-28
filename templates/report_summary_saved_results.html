@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replen Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+        #saved_message {
+            font-size: 30px;
+            color: rgb(0, 255, 0);
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        <h1>Replen Summary</h1>
+        <form action="/save_replen" method="post"> 
+            <button type="submit" disabled>Save Results </button>
+        </form>
+        {% if saved_message %}
+        <div id="saved_message">
+            {{ saved_message }}
+        </div>
+        {% endif %}
+    </header>
+</body>
+</html>
