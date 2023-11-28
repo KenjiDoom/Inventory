@@ -152,8 +152,6 @@ def replen_pull_report():
             print(str(amount_subtracted_warehouse[a]) + ' is not greater then ' + str(my_dict2[b][1]))
             print('----------------------------')
     
-    # Whenever there is an inocrrect number of items in one dict, this whole program won't work.
-    # This needs to contain a return statement, so that it's able to be grabbed from the website.py
     for x, h, g in zip(current_peg_amount, my_dict2, cap_dict):
         if current_peg_amount[x][0] == 0:
             print(str(current_peg_amount[x][0]) + ' is less than ' + str(my_dict2[h][1]))
@@ -178,23 +176,39 @@ def read_yesterday():
         print(str(file_name) + ' was not found...')
         sys.exit(1)
 
-def save_results(data):
+def save_results(data, replen_data):
+    # This function saves the subtracted numbers report and the final replen report data into json files
     current_date = date.today()
     day = str(current_date)
     present_date_log = {'Last_Report_Date': day}
 
+    # Number's subtracted json object
     present_data = {'Date': day}
     present_data.update(data)
-    file_object = json.dumps(present_data, indent=4)
+    number_object = json.dumps(present_data, indent=4)
     
+    # Replen json json object
+    present_replen = {'Date': day}
+    present_replen.update(replen_data)
+    replen_object = json.dumps(present_replen, indent=4)
+
+    # Save's numbers subtracted
     if os.path.dirname('datahub/reports/'):
         with open('datahub/reports/' + str(day) +'.json', 'w') as file:
-            file.write(file_object)
+            file.write(number_object)
     else:
         print('Creating reports directory')
         os.mkdir('datahub/reports/')
         with open('datahub/reports/' + str(day) +'.json', 'w') as file:
-            file.write(file_object)
+            file.write(number_object)
+
+    # Save's replenishment data
+    if os.path.dirname('datahub/reports/replenished-reports/'):
+        with open('datahub/reports/replenished-reports/' + str(day) + '.json', 'w') as f:
+            print('Replen object saved!')
+            f.write(replen_object)
+    else:
+        print("replenished-reports directory not found.")
     
     print('Updating log.json file')
     with open('datahub/log.json', 'w') as log:
