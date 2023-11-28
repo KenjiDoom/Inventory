@@ -55,19 +55,17 @@ def search():
                 sku_result = show_scan_results_for_item(SKU=str(sku_number))
             elif len(sku_number) == 10:
                 sku_result = show_scan_results_for_item(unique_code=str(sku_number))
-                print(sku_result)
             elif len(sku_number) == 39:
                 sku_result = show_scan_results_for_item(unique_code=str(sku_number[6:16]))
 
             if sku_result == None:  
-                return render_template('search.html', error_message='Sku was not found...')
+                return render_template('search_error.html', error_message='Sku was not found...')
             else:
                 totoal_OH = sku_total_amount(sku_number=str(sku_result[0]))
                 description = sku_search(sku_number=sku_result[0])
                 results = [(sku_result[0], sku_result[1], sku_result[2], totoal_OH, description[0][2])]
                 image = search_for_sku_image_file(sku=str(sku_result[0]))
                 return render_template('search.html', results=results, image_file_name=str(image))
-        
         except UnboundLocalError:
             return render_template('search.html', error_message='Sku was not found...')
 
