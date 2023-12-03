@@ -1,6 +1,7 @@
 # Creates users for login page.
 import sqlite3, os
 import json
+
 def create_user_data():
     with sqlite3.connect('user-data.db') as connection:
         cursor = connection.cursor()
@@ -43,12 +44,21 @@ def create_image_file_location():
     with open('Sku_image_locations.json', 'w') as output_file:
         output_file.write(json_object)
 
-        
+def creating_sales_stockroom_db():
+    pog_list = ['Lights', 'Drilling', 'Screwdrivers']
+    database_list = ['stockroom_floor.db', 'sales_floor.db']
+    for database in database_list:
+        with sqlite3.connect(str(database)) as connection:
+            cursor = connection.cursor()
+            for table_name in pog_list:
+                cursor.execute(f"create table {table_name} (SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer, CAPACITY integer, LOCATION string)")
+                connection.commit()
+
 print('1. Create product information database')
 print('2. Create users for website..')
 print('3. Create Image file location json file..')
-
-user_option = input('Enter 1/2: ')
+print("4. Create Sales and stockroom foor database's")
+user_option = input('Enter: ')
 
 if user_option == '1':
     create_product_data()
@@ -56,3 +66,5 @@ elif user_option == '2':
     create_user_data()
 elif user_option == '3':
     create_image_file_location()
+elif user_option == '4':
+    creating_sales_stockroom_db()
