@@ -1,13 +1,14 @@
 from main import *
 from replen import *
+from read_pog import *
 
 def menu():
     print('1. Information on a product')
     print('2. Create a new product')
     print('3. Move an item ')
     print('4. Delete an item')
-    print('5. Create a new location (New database file)')
-    print('6. Create a new sub-location / totes (New database table)')
+    #print('5. Create a new location (New database file)')
+    print('6. Create a new item-group / totes')
     print('7. Update all qr tags')
     print('8. Update or generate a specifc sku qr tag')
     print('9. Generate Report ')
@@ -43,16 +44,22 @@ def menu():
                 print('Is this running mate?')
                 delete_items_from_database(unique_code=item[6:16])
         
-        elif user_option == '5':
-            database_name = input('Enter inventory name: ')
-            database_creation(database_name)
+        # elif user_option == '5':
+        #     database_name = input('Enter inventory name: ')
+        #     database_creation(database_name)
         
         elif user_option == '6':
-            database_name = input('Enter inventory name: ')
             tote_name = input('Enter tote/item group name: ')
-            create_new_item_group(database_file_name=database_name, table_name=tote_name)
+            loc_name = input('Scan or enter POG #: ')
+            data = print_specific_qr_warehouse_tag(tag_name=str(loc_name))
+            if data == None:
+                print('Missing POG number...')
+            elif data != None:
+                value = 'Stockroom floor, ' + data
+                create_new_item_group(table_name=tote_name, location_name=str(value))
         
         elif user_option == '7':
+            # This will be messed up due to new location_name added
             update_all_qr_tags()
         
         elif user_option == '8':
