@@ -40,7 +40,8 @@ def update_all_qr_tags():
                     table_names = cursor.execute("""select name from sqlite_master where type='table';""")
                     results = table_names.fetchall()
                     for tables in results:
-                        generate_qr_codes_for_database(str(database), str(tables[0]))
+                        # This needs to be updated
+                        #generate_qr_codes_for_database(str(database), str(tables[0]))
                         items = cursor.execute(f""" SELECT * from {tables[0]}""")
                         sku_data = items.fetchall()
                         for sku in sku_data:
@@ -54,14 +55,14 @@ def generate_random_uuid():
     data = str(uuid.uuid4().int)
     return data[0:10]
 
-def generate_qr_codes_for_database(database, table_name):
+def generate_qr_codes_for_database(database, table_name, location_name):
     qr = qrcode.QRCode(
         version=10,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=3,
         border=10,
     )
-    qr.add_data(database + ' ' + table_name)
+    qr.add_data(database + ' ' + table_name + ' ' + location_name)
     qr.make(fit=True)
 
     qr_img = qr.make_image(fill_color="black", back_color="white")
@@ -109,18 +110,15 @@ def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
 
     qr_img.save('datahub/qrcodes-generated/' + str(sku) + '_' + str(unique_code) + '.png', 'PNG')
 
-def create_new_item_group(database_file_name, table_name):
-    # This function is used for creating a new item group. AKA: creating a new table within a database.
-    # database representing what area of the store you're inserting this item group into. i.e., stockroom or sales floor.
-    # Might contain fixed values. Sales.db or backend.db
+def create_new_item_group(table_name, location_name):
     try:
-        with sqlite3.connect('datahub/' + database_file_name) as connection:
+        with sqlite3.connect('datahub/' + 'stockroom_floor.db') as connection:
             cursor = connection.cursor()
-            # Table name is the new database name you want to create
             cursor.execute(f"create table {table_name} (SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer, CAPACITY integer, LOCATION string)")
             connection.commit()
     except sqlite3.OperationalError:
         print(f'"{table_name}" already exist...')
+    generate_qr_codes_for_database(database='stockroom_floor.db', table_name=str(table_name), location_name=location_name)
 
 def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=None, unique_code=None):
     # Show's all the items within a database. (Inventory database)
