@@ -49,14 +49,15 @@ def menu():
         #     database_creation(database_name)
         
         elif user_option == '6':
+            # Keep track of all totes created, and location their being saved to. Save this list into a json file.
             tote_name = input('Enter tote/item group name: ')
-            loc_name = input('Scan or enter POG #: ')
-            data = print_specific_qr_warehouse_tag(tag_name=str(loc_name))
-            if data == None:
+            pog_location = input('Scan or enter POG #: ')
+            location_data = print_specific_qr_warehouse_tag(tag_name=str(pog_location))   
+            if pog_location == None:
                 print('Missing POG number...')
-            elif data != None:
-                value = 'Stockroom floor, ' + data
-                create_new_item_group(table_name=tote_name, location_name=str(value))
+            elif pog_location != None:
+                create_new_item_group(table_name=str(tote_name), location_name=str(location_data))
+                generate_qr_codes_for_database(database='stockroom_floor.db', table_name=str(tote_name), location_name=location_data)
         
         elif user_option == '7':
             # This will be messed up due to new location_name added
