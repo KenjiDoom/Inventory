@@ -55,12 +55,12 @@ def generate_random_uuid():
     data = str(uuid.uuid4().int)
     return data[0:10]
 
-def generate_qr_codes_for_database(database, table_name, location_name):
+def generate_qr_codes_for_database(database, table_name, location_name, pog_number=None):
     qr = qrcode.QRCode(
         version=10,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=3,
-        border=10,
+        box_size=8,
+        border=13,
     )
     qr.add_data(database + ' ' + table_name + ' ' + location_name)
     qr.make(fit=True)
@@ -68,23 +68,34 @@ def generate_qr_codes_for_database(database, table_name, location_name):
     qr_img = qr.make_image(fill_color="black", back_color="white")
     draw = ImageDraw.Draw(qr_img)
     
-    text = str(table_name)
+    if pog_number != None:
+        text = str(pog_number) + ' ' + str(table_name) + ' ' + location_name
+    else:
+        text = str(table_name)
+        
     font = ImageFont.load_default()
-
     text_bbox = draw.textbbox((0, 0), text, font=font)
     text_width = text_bbox[2] - text_bbox[0]
     text_height = text_bbox[3] - text_bbox[1]
     
     img_width, img_height = qr_img.size
-    text_x = (img_width - text_width) // 2
-    text_y = img_height - text_height - 10 
+    text_x = (img_width - text_width) // 8
+    text_y = img_height - text_height - 80
     
-    font_size = 15
+    # Changing image size, left off here. Also note I might change the json data removing 'shelfs' and keeping only sections
+    font_size = 20
     font = ImageFont.truetype("static/fonts/DejaVuSans.ttf", size=font_size) 
     
     draw.text((text_x, text_y), text, fill="black", font=font)
 
-    qr_img.save('datahub/qrcodes-generated/' + database.replace('.db', '') + '_' + table_name + '.png')
+    # Generate random or specific end of filename?
+    char_remove = [' ', ',']
+    for chars in char_remove:
+        location_name = location_name.replace(chars, '_')    
+    print(location_name)
+    
+    #updated_description
+    qr_img.save('datahub/qrcodes-generated/' + database.replace('.db', '') + '_' + table_name + '_' + location_name.replace(',', '_') + '.png')
 
 def generate_qr_codes_for_sku(sku, unique_code, table_name, database_file_name):
     qr = qrcode.QRCode(
