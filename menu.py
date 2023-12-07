@@ -1,17 +1,20 @@
 from main import *
 from replen import *
-from read_pog import *
+from read_pog_data import *
+
+# All QR tags will eventually be physically printed.
 
 def menu():
     print('1. Information on a product')
     print('2. Create a new product')
     print('3. Move an item ')
     print('4. Delete an item')
-    #print('5. Create a new location (New database file)')
-    print('6. Create a new item-group / totes')
-    print('7. Update all qr tags')
+    print('5. Create a new item-group / totes')
+    print('6. Generate sales or stockroom POG QR tags.')
+    print('7. Generate all SKU QR tags')
     print('8. Update or generate a specifc sku qr tag')
     print('9. Generate Report ')
+    
     try:
         user_option = input('Select an option: ')
     
@@ -44,23 +47,29 @@ def menu():
                 print('Is this running mate?')
                 delete_items_from_database(unique_code=item[6:16])
         
-        # elif user_option == '5':
-        #     database_name = input('Enter inventory name: ')
-        #     database_creation(database_name)
-        
-        elif user_option == '6':
+        elif user_option == '5':
             # Keep track of all totes created, and location their being saved to. Save this list into a json file.
             tote_name = input('Enter tote/item group name: ')
             pog_location = input('Scan or enter POG #: ')
-            location_data = print_specific_qr_warehouse_tag(tag_name=str(pog_location))   
+            location_data = print_specific_qr_warehouse_tag(tag_name=str(pog_location))
             if pog_location == None:
                 print('Missing POG number...')
             elif pog_location != None:
                 create_new_item_group(table_name=str(tote_name), location_name=str(location_data))
                 generate_qr_codes_for_database(database='stockroom_floor.db', table_name=str(tote_name), location_name=location_data)
         
+        elif user_option == '6':
+            stock_option = input('Enter Sales or stockroom: ')
+            if stock_option == 'Sales':
+                print('Generating sales pog')
+                print_pog_qr_tags(sales_floor='Yes', stockroom=None)
+            elif stock_option == 'Stockroom':
+                print('Generating stockroom pog')
+                print_pog_qr_tags(sales_floor=None, stockroom='Yes')
+        
         elif user_option == '7':
             # This will be messed up due to new location_name added
+            # You need to also remove database printing.
             update_all_qr_tags()
         
         elif user_option == '8':
@@ -74,6 +83,7 @@ def menu():
         elif user_option == '9':
             print('Generating report....')
             replen_pull_report()
+
     except KeyboardInterrupt:
         print('\nExiting...')
 
