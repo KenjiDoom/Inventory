@@ -374,3 +374,104 @@ def search_for_sku_image_file(sku):
     with open('sku_image_locations.json', 'r') as f:
         data = json.loads(f.read())
         return data[sku]
+###########################################################
+
+def gen_all_qr_tags_or_specific(stockroom_floor=None, sales_floor=None, warehouse_specific=None, sales_specific=None, sec_number=None):
+    # This function returns "location" descriptions
+    with open('datahub/pog_data.json') as f:
+        data = json.loads(f.read())
+    
+    pog_names = ['Lights', "Drilling", 'Screwdrivers']
+    pog_description = []
+    
+    if stockroom_floor != None:
+        for pog in pog_names:
+            rack_value = data[str(pog)]['Stockroom_pog']['1']
+            pog_number = data[str(pog)]['Pog_number']
+            pog_description.append('POG #' + pog_number + ', ' + str(pog) + ', ' + rack_value) 
+    
+    if sales_floor != None:
+        range_list = []
+        for pog in pog_names:
+            values = len(data[str(pog)]['Sales_pog'])
+            range_list.append(values)
+            
+        for pog in pog_names:
+            for number, num in enumerate(range_list):
+                for i in range(1, num):
+                    try:
+                        asile_value = data[str(pog)]['Sales_pog'][str(i)]
+                        pog_number = data[str(pog)]['Pog_number']
+                        pog_description.append('POG #' + pog_number + ', ' + str(pog) + ', ' + asile_value)
+                    except KeyError:
+                        pass
+    
+    elif warehouse_specific != None:
+        r_value = data[str(warehouse_specific)]['Stockroom_pog']['1']
+        pog_num = data[str(warehouse_specific)]['Pog_number']
+        pog_description.append('POG #' + pog_num + ', ' + str(warehouse_specific) + ', ' + r_value)
+    
+    elif sales_specific != None:
+        try:
+            a_value = data[str(sales_specific)]['Sales_pog']["%s" % str(sec_number)]
+            pog_num = data[str(sales_specific)]['Pog_number']
+            pog_description.append('POG #' + pog_num + ', ' + str(sales_specific) + ', '+ a_value)
+        except KeyError:
+            print('Section number not found.')
+            sys.exit(1)
+    
+    return pog_description
+
+def print_pog_qr_tags(stockroom=None, sales_floor=None):
+    #KEYWORD "ALL"
+    # This function will generate ALL qr POG tags with descriptions inlcuded. This is printing all the pog description tags within sales or stockroom floor.
+    print('Confirm: Running...')
+    if stockroom != None:
+        qr_tags_data = gen_all_qr_tags_or_specific(stockroom_floor='Yes', sales_floor=None, warehouse_specific=None)
+        range_number = len(qr_tags_data)
+        for i in range(range_number):
+            find_value = qr_tags_data[i][9:].find(',')
+            table_value = qr_tags_data[i][9:]
+            table_name = table_value[:find_value]
+            print('stockroom_floor.db, ' + table_name + ', ' + qr_tags_data[i])
+            generate_qr_codes_for_database(database='stockroom_floor.db', table_name=table_name, location_name=qr_tags_data[i], pog_number=qr_tags_data[i][:7])
+    elif sales_floor != None:
+        qr_tags_data = gen_all_qr_tags_or_specific(stockroom_floor=None, sales_floor='Yes', warehouse_specific=None)
+        range_number = len(qr_tags_data)
+        print(range_number)
+        for i in range(range_number):
+            find_value = qr_tags_data[i][9:].find(',')
+            table_value = qr_tags_data[i][9:]
+            table_name = table_value[:find_value]
+            print('sales_floor.db, ' + table_name + ', ' + qr_tags_data[i])
+            generate_qr_codes_for_database(database='sales_floor.db', table_name=table_name, location_name=qr_tags_data[i], pog_number=qr_tags_data[i][:7])
+
+def print_specific_qr_tag(tag_name, sales=None, stockroom=None):
+    # KEYWORD "SPECIFIC"
+    # This function will serach for a specific "location" description. When the assoicate wants to only print one tag
+    value = None
+
+    if stockroom != None:
+        if tag_name.lower() in ("22", "lights"):
+            print('Generating Lights stockroom qr-tag')
+            value = gen_all_qr_tags_or_specific(warehouse_specific=str('Lights'))
+        elif tag_name.lower() in ("27", "screwdrivers"):
+            print('Generating screwdrivers stockroom qr-tag')
+            value = gen_all_qr_tags_or_specific(warehouse_specific=str('Screwdrivers'))
+        elif tag_name.lower() in ("drilling", "33"):
+            print('Generating Drilling stockroom qr tag')
+            value = gen_all_qr_tags_or_specific(warehouse_specific=str('Drilling'))
+        else:
+            return None
+    elif sales != None:
+        if tag_name.lower() in ("22", "lights"):
+            print("Generating Lights sales qr tag")
+            value = gen_all_qr_tags_or_specific(sales_specific=str('Lights'), sec_number=str(sales))
+        elif tag_name.lower() in ("27", "screwdrivers"):
+            value = gen_all_qr_tags_or_specific(sales_specific=str('Screwdrivers'), sec_number=str(sales))
+        elif tag_name.lower() in ("33", "drilling"):
+            value = gen_all_qr_tags_or_specific(sales_specific=str('Drilling'), sec_number=str(sales))
+        else:
+            return None
+
+    return value
