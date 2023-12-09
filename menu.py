@@ -83,8 +83,16 @@ def menu():
                     description = tablename[value + 2:]
                     generate_qr_codes_for_database(database='sales_floor.db', table_name=str(table), location_name=str(description), pog_number=str(pog_number))
             elif stock_option.lower() == 'stockroom':
+                # LEFT OF HERE SOMETHING IS WRONG WITH DESCRIPTION
                 pog_name = input('Enter pog number/name: ')
-                print_specific_qr_tag(tag_name=str(pog_name), stockroom='yes', sales=None)
+                value = print_specific_qr_tag(tag_name=str(pog_name), stockroom='yes', sales=None)
+                for data in value:
+                    pog_number = data[:7]
+                    tablename = data[9:]
+                    com_value = tablename.find(',')
+                    table = tablename[:com_value]
+                    description = tablename[com_value:]
+                    generate_qr_codes_for_database(database='stockroom_floor.db', table_name=str(table), location_name=str(description), pog_number=str(pog_number))
             
         elif user_option == '8':
            # This will be messed up due to new location_name added
