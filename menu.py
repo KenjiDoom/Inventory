@@ -7,7 +7,7 @@ def menu():
     print('3. Move an item ')
     print('4. Delete an item')
     print('5. Create a new item-group / totes')
-    print('6. Generate sales or stockroom POG QR tags.')
+    print('6. Generate ALL sales or stockroom POG QR tags.')
     print('7. Generate specific POG QR tags.')
     print('8. Generate all SKU QR tags')
     print('9. Update or generate a specifc sku qr tag')
@@ -46,15 +46,16 @@ def menu():
                 delete_items_from_database(unique_code=item[6:16])
         
         elif user_option == '5':
-            # Keep track of all totes created, and location their being saved to. Save this list into a json file.
+            # To-do: Keep track of all totes created, and location their being saved to. Save this list into a json file.
             tote_name = input('Enter tote/item group name: ')
             pog_location = input('Scan or enter POG #: ')
             location_data = print_specific_qr_tag(tag_name=str(pog_location), stockroom='Yes')
             if pog_location == None:
                 print('Missing POG number...')
             elif pog_location != None:
-                create_new_item_group(table_name=str(tote_name), location_name=str(location_data))
-                generate_qr_codes_for_database(database='stockroom_floor.db', table_name=str(tote_name), location_name=location_data)
+                for location in location_data:
+                    create_new_item_group(table_name=str(tote_name), location_name=str(location))
+                    generate_qr_codes_for_database(database='stockroom_floor.db', table_name=str(tote_name), location_name=location)
         
         elif user_option == '6':
             # Printing all pog tags
