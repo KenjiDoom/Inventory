@@ -71,7 +71,7 @@ def generate_qr_codes_for_database(database, table_name, location_name, pog_numb
     if pog_number != None:
         text = str(pog_number) + ' ' + str(table_name) + ' ' + location_name
     else:
-        text = str(table_name)
+        text = str(table_name) + ' ' + location_name
         
     font = ImageFont.load_default()
     text_bbox = draw.textbbox((0, 0), text, font=font)
@@ -91,8 +91,7 @@ def generate_qr_codes_for_database(database, table_name, location_name, pog_numb
     # Generate random or specific end of filename?
     char_remove = [' ', ',']
     for chars in char_remove:
-        location_name = location_name.replace(chars, '_')    
-    print(location_name)
+        location_name = location_name.replace(chars, '_')
     
     #updated_description
     qr_img.save('datahub/qrcodes-generated/' + database.replace('.db', '') + '_' + table_name + '_' + location_name.replace(',', '_') + '.png')
@@ -227,7 +226,7 @@ def copy_item_to_inventory_database(unique_code=None, destination_filename=None,
         print('Error item not found...' + str(e))
 
 def delete_items_from_database(unique_code=None, item_and_destination_data=None):
-    if item_and_destination_data != None: # Needs datahub update
+    if item_and_destination_data != None:
         with sqlite3.connect('datahub/' + str(item_and_destination_data[6])) as connection:
             cursor = connection.cursor()
             cursor.execute(f"""DELETE from {str(item_and_destination_data[7])} where unique_code={str(unique_code)}""")
