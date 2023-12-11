@@ -1,8 +1,5 @@
 from main import *
 from replen import *
-from read_pog_data import *
-
-# All QR tags will eventually be physically printed.
 
 def menu():
     print('1. Information on a product')
