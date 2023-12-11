@@ -1,0 +1,56 @@
+{
+	"Lights":
+	{
+		"Sku":
+		{
+			"10034": "Asile 1, Section 1, Shelf 1",
+			"68987": "Asile 1, Section 2, Backboard"
+		},
+		"Sales_pog":
+		{
+			"1": "Asile 1, Section 1, Shelf 1",
+			"2": "Asile 1, Section 1, Backboard",
+			"3": "Asile 1, Section 2, Backboard"
+		},
+		"Stockroom_pog":
+		{
+			"1": "Rack 1"
+		},
+		"Pog_number": "22"
+	},
+
+	"Drilling":
+	{
+		"Sku:":
+		{
+			"10454": "Asile 2, Section 1, Shelf 2"
+		},
+		"Sales_pog":
+		{
+			"1": "Asile, 2, Section Section 1, Shelf 1 ",
+			"2": "Asile, 2, Section Section 1, Shelf 2 "
+		},
+		"Stockroom_pog":
+		{
+			"1": "Rack 2"
+		},
+		"Pog_number": "33"
+	},
+	"Screwdrivers":
+	{
+		"Sku":
+		{
+			"20201": "Asile 3, Section 1, Shelf 1"
+		},
+		"Sales_pog":
+		{
+			"1": "Asile 3, Section 1, Shelf 1"
+		},
+		"Stockroom_pog":
+		{
+			"1": "Rack 3"
+		},
+		"Pog_number": "27",
+		"Location": "33"
+	}
+}
