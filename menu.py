@@ -7,11 +7,11 @@ def menu():
     print('3. Move an item ')
     print('4. Delete an item')
     print('5. Create a new item-group / totes')
-    print('6. Generate ALL sales or stockroom POG QR tags.')
+    print('6. Generate ALL sales/stockroom POG QR tags.')
     print('7. Generate specific POG QR tags.')
     print('8. Generate all SKU QR tags')
-    print('9. Update or generate a specifc sku qr tag')
-    print('10. Generate Report ')
+    print('9. Generate a specifc sku qr tag')
+    print('10. Generate Replen Report ')
     
     try:
         user_option = input('Select an option: ')
@@ -24,8 +24,11 @@ def menu():
         elif user_option == '2':
             sku = input('Scan/Enter a SKU: ')
             database_location = input('Scan inventory tag: ')
-            value = database_location.find(' ')
-            unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=database_location[0:value], destination_table_name=database_location[value:])
+            print(database_location)
+            # Slicing needs to be worked here
+            value = database_location.find(',')
+            
+            #unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=database_location[0:value], destination_table_name=database_location[value:])
         
         elif user_option == '3':
             try:
@@ -61,11 +64,14 @@ def menu():
             # Printing all pog tags
             stock_option = input('Enter Sales or stockroom: ')
             if stock_option.lower() == 'sales':
-                print_pog_qr_tags(sales_floor='Yes', stockroom=None)
+                qr_tags_data = gen_all_qr_tags_or_specific(stockroom_floor=None, sales_floor='Yes', warehouse_specific=None)
+                for data in qr_tags_data:
+                    generate_all_qr_codes_database(database='sales_floor.db', description=str(data))
             elif stock_option.lower() == 'stockroom':
-                print('Generating stockroom pog')
-                print_pog_qr_tags(sales_floor=None, stockroom='Yes')
-        
+                qr_tags_data = gen_all_qr_tags_or_specific(stockroom_floor='Yes', sales_floor=None, warehouse_specific=None)
+                for i in qr_tags_data:
+                    generate_all_qr_codes_database(database='stockroom_floor.db', description=str(i))
+
         elif user_option == '7':
             print('Printing specific pog tag')
             stock_option = input('Enter sales/stockroom: ')
@@ -93,8 +99,6 @@ def menu():
                     generate_qr_codes_for_database(database='stockroom_floor.db', table_name=str(table), location_name=str(description), pog_number=str(pog_number))
             
         elif user_option == '8':
-           # This will be messed up due to new location_name added
-            # You need to also remove database printing. 
             update_all_qr_tags()
         
         elif user_option == '9':
