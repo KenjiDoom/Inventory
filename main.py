@@ -22,6 +22,7 @@ def database_creation(database_name):
             print('That file already exist...')
 
 def update_all_qr_tags():
+    # STILL WORKING ON THIS
     print('Updating all qr tags with update-to-date locations and information')
     try:
         exclude_db_names = ['user-data.db', 'product_information_database.db']
@@ -40,8 +41,6 @@ def update_all_qr_tags():
                     table_names = cursor.execute("""select name from sqlite_master where type='table';""")
                     results = table_names.fetchall()
                     for tables in results:
-                        # This needs to be updated
-                        #generate_qr_codes_for_database(str(database), str(tables[0]))
                         items = cursor.execute(f""" SELECT * from {tables[0]}""")
                         sku_data = items.fetchall()
                         for sku in sku_data:
@@ -54,6 +53,34 @@ def generate_random_uuid():
     # This is used for identifying, product, totes and stockroom inventory.
     data = str(uuid.uuid4().int)
     return data[0:10]
+
+def generate_all_qr_codes_database(database, description):
+    qr = qrcode.QRCode(
+        version=10,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=8,
+        border=13,
+    )
+
+    qr.add_data(database +', ' + description)
+    qr.make(fit=True)
+    qr_img = qr.make_image(fill_color="black", back_color="white")
+    draw = ImageDraw.Draw(qr_img)
+    text = str(database) + ', ' + description
+    font = ImageFont.load_default()
+    text_bbox = draw.textbbox((0, 0), text, font=font)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+    
+    img_width, img_height = qr_img.size
+    text_x = (img_width - text_width) // 8
+    text_y = img_height - text_height - 80
+    font_size = 20
+    font = ImageFont.truetype("static/fonts/DejaVuSans.ttf", size=font_size) 
+    
+    draw.text((text_x, text_y), text, fill="black", font=font)
+
+    qr_img.save('datahub/qrcodes-generated/' + database.replace('.db', '') + description.replace(' ', '').replace(',', '') + '.png')
 
 def generate_qr_codes_for_database(database, table_name, location_name, pog_number=None):
     qr = qrcode.QRCode(
@@ -420,30 +447,6 @@ def gen_all_qr_tags_or_specific(stockroom_floor=None, sales_floor=None, warehous
             sys.exit(1)
     
     return pog_description
-
-def print_pog_qr_tags(stockroom=None, sales_floor=None):
-    #KEYWORD "ALL"
-    # This function will generate ALL qr POG tags with descriptions inlcuded. This is printing all the pog description tags within sales or stockroom floor.
-    print('Confirm: Running...')
-    if stockroom != None:
-        qr_tags_data = gen_all_qr_tags_or_specific(stockroom_floor='Yes', sales_floor=None, warehouse_specific=None)
-        range_number = len(qr_tags_data)
-        for i in range(range_number):
-            find_value = qr_tags_data[i][9:].find(',')
-            table_value = qr_tags_data[i][9:]
-            table_name = table_value[:find_value]
-            print('stockroom_floor.db, ' + table_name + ', ' + qr_tags_data[i])
-            generate_qr_codes_for_database(database='stockroom_floor.db', table_name=table_name, location_name=qr_tags_data[i], pog_number=qr_tags_data[i][:7])
-    elif sales_floor != None:
-        qr_tags_data = gen_all_qr_tags_or_specific(stockroom_floor=None, sales_floor='Yes', warehouse_specific=None)
-        range_number = len(qr_tags_data)
-        print(range_number)
-        for i in range(range_number):
-            find_value = qr_tags_data[i][9:].find(',')
-            table_value = qr_tags_data[i][9:]
-            table_name = table_value[:find_value]
-            print('sales_floor.db, ' + table_name + ', ' + qr_tags_data[i])
-            generate_qr_codes_for_database(database='sales_floor.db', table_name=table_name, location_name=qr_tags_data[i], pog_number=qr_tags_data[i][:7])
 
 def print_specific_qr_tag(tag_name, sales=None, stockroom=None):
     # KEYWORD "SPECIFIC"
