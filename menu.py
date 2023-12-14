@@ -23,12 +23,20 @@ def menu():
         
         elif user_option == '2':
             sku = input('Scan/Enter a SKU: ')
-            database_location = input('Scan inventory tag: ')
-            print(database_location)
-            # Slicing needs to be worked here
-            value = database_location.find(',')
+            destination_location = input('Scan inventory tag: ')
+            f_comma = destination_location.find(',') + 2
+            s_comma = destination_location[f_comma:].find(',')
+
+            t_comma = f_comma + s_comma
+
+            table_comma = destination_location[t_comma + 2:].find(',')
+
+            table = destination_location[t_comma + 2:]
+            third_comma = destination_location[t_comma + 2:].find(',')
+
+            table_name = table[:third_comma]
             
-            #unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=database_location[0:value], destination_table_name=database_location[value:])
+            #unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=, destination_table_name=str(table_name))
         
         elif user_option == '3':
             try:
