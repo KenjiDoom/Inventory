@@ -26,17 +26,17 @@ def menu():
             destination_location = input('Scan inventory tag: ')
             f_comma = destination_location.find(',') + 2
             s_comma = destination_location[f_comma:].find(',')
-
             t_comma = f_comma + s_comma
-
+            
             table_comma = destination_location[t_comma + 2:].find(',')
-
             table = destination_location[t_comma + 2:]
             third_comma = destination_location[t_comma + 2:].find(',')
-
-            table_name = table[:third_comma]
             
-            #unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=, destination_table_name=str(table_name))
+            table_name = table[:third_comma]
+            f_value = f_comma - 2
+            des_file = destination_location[:f_value]
+            
+            unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=str(des_file), destination_table_name=str(table_name))
         
         elif user_option == '3':
             try:
