@@ -48,11 +48,15 @@ def creating_sales_stockroom_db():
     pog_list = ['Lights', 'Drilling', 'Screwdrivers']
     database_list = ['stockroom_floor.db', 'sales_floor.db']
     for database in database_list:
-        with sqlite3.connect(str(database)) as connection:
-            cursor = connection.cursor()
-            for table_name in pog_list:
-                cursor.execute(f"create table {table_name} (SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer, CAPACITY integer, LOCATION string)")
-                connection.commit()
+        try:
+            with sqlite3.connect(str(database)) as connection:
+                cursor = connection.cursor()
+                for table_name in pog_list:
+                    print('Created ' + str(database))
+                    cursor.execute(f"create table {table_name} (SKU integer, DESCRIPTION text, PRICE integer, UNIQUE_CODE integer, CAPACITY integer, LOCATION string)")
+                    connection.commit()
+        except sqlite3.OperationalError:
+            print('File already created.')
 
 print('1. Create product information database')
 print('2. Create users for website..')
