@@ -8,7 +8,7 @@ def menu():
     print('4. Delete an item')
     print('5. Create a new item-group / totes')
     print('6. Generate ALL sales/stockroom POG QR tags.')
-    print('7. Generate specific POG QR tags.')
+    print('7. Generate specific POG QR tags. - Problem! Dont use')
     print('8. Generate all SKU QR tags')
     print('9. Generate a specifc sku qr tag')
     print('10. Generate Replen Report ')
@@ -41,9 +41,25 @@ def menu():
         elif user_option == '3':
             try:
                 item = input('Scan item tag: ')
-                database_location = input('Scan inventory tag: ')
-                value = database_location.find(' ')
-                copy_item_to_inventory_database(unique_code=item[6:16], destination_filename=database_location[0:value], destination_table_name=database_location[value:].replace(' ', ''))
+                
+                destination_location = input('Scan inventory tag: ')
+                f_comma = destination_location.find(',') + 2
+                s_comma = destination_location[f_comma:].find(',')
+                t_comma = f_comma + s_comma
+
+                table_comma = destination_location[t_comma + 2:].find(',')
+                table = destination_location[t_comma + 2:]
+                third_comma = destination_location[t_comma + 2:].find(',')
+
+                table_name = table[:third_comma]
+                f_value = f_comma - 2
+                des_file = destination_location[:f_value]
+                
+                print(des_file)
+                print('-----')
+                print(table_name)
+                
+                copy_item_to_inventory_database(unique_code=item[6:16], destination_filename=str(des_file), destination_table_name=str(table_name))
             except IndexError as e:
                 return 'Error no item was scanned...' + str(e)
         
