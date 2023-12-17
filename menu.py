@@ -10,7 +10,7 @@ def menu():
     print('6. Generate ALL sales/stockroom POG QR tags.')
     print('7. Generate specific POG QR tags. - Problem! Dont use')
     print('8. Generate all SKU QR tags')
-    print('9. Generate a specifc sku qr tag')
+    print('9. Generate a Specifc SKU QR tag')
     print('10. Generate Replen Report ')
     
     try:
@@ -22,7 +22,7 @@ def menu():
             print(sku_information)
         
         elif user_option == '2':
-            sku = input('Scan/Enter a SKU: ')
+            sku = input('Enter a SKU number to generate: ')
             destination_location = input('Scan inventory tag: ')
             f_comma = destination_location.find(',') + 2
             s_comma = destination_location[f_comma:].find(',')
@@ -30,13 +30,16 @@ def menu():
             
             table_comma = destination_location[t_comma + 2:].find(',')
             table = destination_location[t_comma + 2:]
-            third_comma = destination_location[t_comma + 2:].find(',')
             
+            third_comma = destination_location[t_comma + 2:].find(',')
             table_name = table[:third_comma]
+            
             f_value = f_comma - 2
             des_file = destination_location[:f_value]
             
-            unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=str(des_file), destination_table_name=str(table_name))
+            location = table[2 + third_comma:]
+            
+            unique_code_modification_and_transfer(sku_number=sku[0:5], destination_filename=str(des_file), destination_table_name=str(table_name), location_text=str(location))
         
         elif user_option == '3':
             try:
