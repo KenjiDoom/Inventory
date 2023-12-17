@@ -49,17 +49,18 @@ def menu():
 
                 table_comma = destination_location[t_comma + 2:].find(',')
                 table = destination_location[t_comma + 2:]
+                
                 third_comma = destination_location[t_comma + 2:].find(',')
-
                 table_name = table[:third_comma]
+                
                 f_value = f_comma - 2
                 des_file = destination_location[:f_value]
                 
-                print(des_file)
-                print('-----')
-                print(table_name)
-                
-                copy_item_to_inventory_database(unique_code=item[6:16], destination_filename=str(des_file), destination_table_name=str(table_name))
+                third_comma = third_comma + 2
+                location = table[third_comma:]
+            
+                copy_item_to_inventory_database(unique_code=item[6:16], destination_filename=str(des_file), destination_table_name=str(table_name), location_text=str(location))
+            
             except IndexError as e:
                 return 'Error no item was scanned...' + str(e)
         
