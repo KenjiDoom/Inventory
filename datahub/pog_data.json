@@ -9,12 +9,11 @@
 		"Sales_pog":
 		{
 			"1": "Asile 1, Section 1, Shelf 1",
-			"2": "Asile 1, Section 1, Backboard",
 			"3": "Asile 1, Section 2, Backboard"
 		},
 		"Stockroom_pog":
 		{
-			"1": "Rack 1"
+			"1": "Stockfloor Rack 1"
 		},
 		"Pog_number": "22"
 	},
@@ -27,12 +26,12 @@
 		},
 		"Sales_pog":
 		{
-			"1": "Asile, 2, Section Section 1, Shelf 1 ",
-			"2": "Asile, 2, Section Section 1, Shelf 2 "
+			"1": "Asile 2, Section Section 1, Shelf 1",
+			"2": "Asile 2, Section Section 1, Shelf 2 "
 		},
 		"Stockroom_pog":
 		{
-			"1": "Rack 2"
+			"1": "Stockfloor Rack 2"
 		},
 		"Pog_number": "33"
 	},
@@ -48,7 +47,7 @@
 		},
 		"Stockroom_pog":
 		{
-			"1": "Rack 3"
+			"1": "Stockfloor Rack 3"
 		},
 		"Pog_number": "27",
 		"Location": "33"
