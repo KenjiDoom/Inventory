@@ -265,19 +265,18 @@ def delete_items_from_database(unique_code=None, item_and_destination_data=None)
         except TypeError as e:
             print('Item not found ' + str(e))
 
-def unique_code_modification_and_transfer(sku_number=None, destination_filename=None, destination_table_name=None):
+def unique_code_modification_and_transfer(sku_number=None, destination_filename=None, destination_table_name=None, location_text=None):
     with sqlite3.connect('datahub/product_information_database.db') as connection:
         cursor = connection.cursor()
         cursor = cursor.execute(f"SELECT {sku_number}, DESCRIPTION, PRICE, CAPACITY, LOCATION from product_info WHERE sku={sku_number}")
         sku_data = cursor.fetchone()
-        print(sku_data)
         new_modified_data = [
-            (sku_data[0], sku_data[1], sku_data[2], generate_random_uuid(), sku_data[3], sku_data[4])
+            (sku_data[0], sku_data[1], sku_data[2], generate_random_uuid(), sku_data[3], location_text)
         ]
         with sqlite3.connect('datahub/' + str(destination_filename)) as connection:
-            cursor = connection.cursor()
-            cursor.executemany(f'INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?, ?, ?)', new_modified_data)
-            connection.commit()
+           cursor = connection.cursor()
+           cursor.executemany(f'INSERT INTO {destination_table_name} VALUES (?, ?, ?, ?, ?, ?)', new_modified_data)
+           connection.commit()
         print('Done..')
 
 def total_amount_sku(sku_number=None, database_file_name=None, table_name=None, sku=None):
