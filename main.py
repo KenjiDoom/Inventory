@@ -215,33 +215,28 @@ def show_scan_results_for_item(table_name=None, database_file_name=None, SKU=Non
             print(e)
             print('!! Error must have scanned an inventory qr tag instead of a item. !!')
 
-def copy_item_to_inventory_database(unique_code=None, destination_filename=None, destination_table_name=None):
+def copy_item_to_inventory_database(unique_code=None, destination_filename=None, destination_table_name=None, location_text=None):
     # Copy an item into a database
-    # Needs datahub update
+    # Needs "location" update
     sku_data = show_scan_results_for_item(unique_code=unique_code)
     try:
         if sku_data[0] != None:
             if destination_filename == None:
                 pass
             elif destination_filename != None:
-                if os.path.exists('datahub/' + destination_filename) == True:
+                if os.path.exists('datahub/' + str(destination_filename)) == True:
                     try:
                         struct_data = [
-                            (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5]), 
-                            (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], sku_data[5], sku_data[7], sku_data[6]),
+                            (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], location_text), 
+                            (sku_data[0], sku_data[1], sku_data[2], unique_code, sku_data[4], location_text, sku_data[7], sku_data[6]),
                         ]
-                        print(destination_filename, destination_table_name)
                         with sqlite3.connect('datahub/' + str(destination_filename)) as connection:
-                            cursor = connection.cursor()
-                            sql_command = f"INSERT INTO {destination_table_name} VALUES (:col1, :col2, :col3, :col4, :col5, :col6)"
-                            cursor.execute(sql_command, {'col1': struct_data[0][0], 'col2': struct_data[0][1], 'col3': struct_data[0][2], 'col4': struct_data[0][3], 'col5': struct_data[0][4], 'col6':struct_data[0][5]})
-                            connection.commit()
-                            delete_items_from_database(unique_code=unique_code, item_and_destination_data=struct_data[1])
-                            return 'deleted'
-                        # Hmmmm..... So it scans the item into the database BUT doesn't delet it. It claims
-                    # except sqlite3.OperationalError as e:
-                    #     print('Error scanned an item into an item.')
-                    #     print(e)
+                           cursor = connection.cursor()
+                           sql_command = f"INSERT INTO {destination_table_name} VALUES (:col1, :col2, :col3, :col4, :col5, :col6)"
+                           cursor.execute(sql_command, {'col1': struct_data[0][0], 'col2': struct_data[0][1], 'col3': struct_data[0][2], 'col4': struct_data[0][3], 'col5': struct_data[0][4], 'col6':struct_data[0][5]})
+                           connection.commit()
+                           delete_items_from_database(unique_code=unique_code, item_and_destination_data=struct_data[1])
+                           return 'deleted'
                     except IndexError as e:
                         print('!! Error nothing was scanned. !!')
                         print(e)
