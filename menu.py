@@ -92,40 +92,29 @@ def menu():
             # Printing all pog tags
             stock_option = input('Enter Sales or stockroom: ')
             if stock_option.lower() == 'sales':
-                qr_tags_data = gen_all_qr_tags_or_specific(stockroom_floor=None, sales_floor='Yes', warehouse_specific=None)
+                qr_tags_data = generate_all_pog_tags(stockroom_floor=None, sales_floor='Yes', warehouse_specific=None)
                 for data in qr_tags_data:
                     generate_all_qr_codes_database(database='sales_floor.db', description=str(data))
             elif stock_option.lower() == 'stockroom':
-                qr_tags_data = gen_all_qr_tags_or_specific(stockroom_floor='Yes', sales_floor=None, warehouse_specific=None)
+                qr_tags_data = generate_all_pog_tags(stockroom_floor='Yes', sales_floor=None, warehouse_specific=None)
                 for i in qr_tags_data:
                     generate_all_qr_codes_database(database='stockroom_floor.db', description=str(i))
 
         elif user_option == '7':
-            print('Printing specific pog tag')
-            stock_option = input('Enter sales/stockroom: ')
-            if stock_option.lower() == 'sales':
-                pog_name = input('Enter pog number/name: ')
-                section_number = input('Enter section number: ')
-                value = print_specific_qr_tag(tag_name=str(pog_name), sales=str(section_number), stockroom=None)
-                for data in value:
-                    pog_number = data[:7]
-                    tablename = data[9:]
-                    value = tablename.find(',')
-                    table = tablename[:value]
-                    description = tablename[value + 2:]
-                    generate_qr_codes_for_database(database='sales_floor.db', table_name=str(table), location_name=str(description), pog_number=str(pog_number))
-            elif stock_option.lower() == 'stockroom':
-                # LEFT OF HERE SOMETHING IS WRONG WITH DESCRIPTION
-                pog_name = input('Enter pog number/name: ')
-                value = print_specific_qr_tag(tag_name=str(pog_name), stockroom='yes', sales=None)
-                for data in value:
-                    pog_number = data[:7]
-                    tablename = data[9:]
-                    com_value = tablename.find(',')
-                    table = tablename[:com_value]
-                    description = tablename[com_value:]
-                    generate_qr_codes_for_database(database='stockroom_floor.db', table_name=str(table), location_name=str(description), pog_number=str(pog_number))
+            pog = input('Pog Number/Name: ')
+            sales_or_stockroom = input('Sales/Stockroom: ')
             
+            if sales_or_stockroom.lower() == 'sales':
+                data = generate_specfic_pog_tag(pog_data=str(pog), sales_floor='True')
+                for i in data:
+                 generate_all_qr_codes_database(database='sales_floor.db', description=str(i))   
+            elif sales_or_stockroom.lower() == 'stockroom':
+                data = generate_specfic_pog_tag(pog_data=str(pog), stockroom_floor='True')
+                for i in data:
+                    generate_all_qr_codes_database(database='stockroom_floor.db', description=str(i))
+            else:
+                print("Not working")
+        
         elif user_option == '8':
             update_all_qr_tags()
         
