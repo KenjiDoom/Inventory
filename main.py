@@ -391,10 +391,9 @@ def sku_total_amount(sku_number):
     return len(sku_list)
 
 def search_for_sku_image_file(sku):
-    with open('sku_image_locations.json', 'r') as f:
+    with open('datahub/image_location_sku.json', 'r') as f:
         data = json.loads(f.read())
         return data[sku]
-###########################################################
 
 def generate_all_pog_tags(stockroom_floor=None, sales_floor=None, sec_number=None):
     # This function returns "location" descriptions
