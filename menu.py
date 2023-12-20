@@ -8,7 +8,7 @@ def menu():
     print('4. Delete an item')
     print('5. Create a new item-group / totes')
     print('6. Generate ALL sales/stockroom POG QR tags.')
-    print('7. Generate specific POG QR tags. - Problem! Dont use')
+    print('7. Generate specific POG QR tags.')
     print('8. Generate all SKU QR tags')
     print('9. Generate a Specifc SKU QR tag')
     print('10. Generate Replen Report ')
