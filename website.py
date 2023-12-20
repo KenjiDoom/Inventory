@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect
 import sqlite3, socket
 from replen import *
 from main import *
-from search_sku_image import *
 app = Flask(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
@@ -50,7 +49,6 @@ def search():
     if request.method == 'POST':
         try:
             sku_number = request.form['sku']
-            print(len(sku_number))
             if len(sku_number) == 5:
                 sku_result = show_scan_results_for_item(SKU=str(sku_number))
             elif len(sku_number) == 10:
@@ -62,9 +60,12 @@ def search():
                 return render_template('search_error.html', error_message='Sku was not found...')
             else:
                 totoal_OH = sku_total_amount(sku_number=str(sku_result[0]))
-                description = sku_search(sku_number=sku_result[0])
-                results = [(sku_result[0], sku_result[1], sku_result[2], totoal_OH, description[0][2])]
+                description = sku_search(sku_number=sku_result[0])    
                 image = search_for_sku_image_file(sku=str(sku_result[0]))
+                try:
+                    results = [(sku_result[0], sku_result[1], sku_result[2], totoal_OH, sku_result[5])]
+                except IndexError:
+                    results = [(sku_result[0], sku_result[1], sku_result[2], totoal_OH, description[0][2])]
                 return render_template('search.html', results=results, image_file_name=str(image))
         except UnboundLocalError:
             return render_template('search.html', error_message='Sku was not found...')
