@@ -139,17 +139,32 @@ def labelpro():
 @app.route('/moving_item', methods=['GET', 'POST'])
 def moving_item():
     if request.method == 'POST':
-        sku_number = request.form['sku']
-        inventory = request.form['inventory_location']
-        value = inventory.find(' ')
-        data = copy_item_to_inventory_database(unique_code=sku_number[6:16], destination_filename=inventory[0:value], destination_table_name=inventory[value:].replace(' ', ''))
+        item = request.form['item_tag']
+        print(item[6:16])
+
+        destination_location = request.form['inventory_location']
+        
+        f_comma = destination_location.find(',') + 2
+        s_comma = destination_location[f_comma:].find(',')
+        t_comma = f_comma + s_comma
+        table_comma = destination_location[t_comma + 2:].find(',')
+        table = destination_location[t_comma + 2:]
+        
+        third_comma = destination_location[t_comma + 2:].find(',')
+        table_name = table[:third_comma]
+        
+        f_value = f_comma - 2
+        des_file = destination_location[:f_value]
+        
+        third_comma = third_comma + 2
+        location = table[third_comma:]
+        
+        data = copy_item_to_inventory_database(unique_code=item[6:16], destination_filename=str(des_file), destination_table_name=str(table_name), location_text=str(location))
         if data == 'deleted':
             return render_template('moving_item.html', result='item was moved successfully...')
         else:
             return render_template('moving_item.html', error_message='Item not found...')
-
-    return render_template('moving_item.html')
-
+    
     return render_template('moving_item.html')
 
 @app.route('/report_summary', methods=['GET', 'POST'])
