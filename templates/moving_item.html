@@ -74,8 +74,8 @@
 </head>
 <body>
     <form method="POST" id="inventoryForm">
-        <label for="sku">SKU:</label>
-        <input type="text" id="sku" name="sku" required>
+        <label for="item_tag">Scan Item:</label>
+        <input type="text" id="item_tag" name="item_tag" required>
         <br>
         {% if error_message %}
         <div id="error_message">
@@ -89,7 +89,7 @@
         </div>
         {% endif %}
 
-        <label for="location">Inventory Location:</label>
+        <label for="location">Scan Location:</label>
         <input type="text" id="location" name="inventory_location" required>
         <br>
         <button name="enter_button"type="submit">Enter</button>
