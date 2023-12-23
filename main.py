@@ -109,7 +109,6 @@ def generate_qr_codes_for_database(database, table_name, location_name, pog_numb
     text_x = (img_width - text_width) // 8
     text_y = img_height - text_height - 80
     
-    # Changing image size, left off here. Also note I might change the json data removing 'shelfs' and keeping only sections
     font_size = 20
     font = ImageFont.truetype("static/fonts/DejaVuSans.ttf", size=font_size) 
     
@@ -337,26 +336,28 @@ def validate_table_name(table_name=None, database_file_name=None):
     return valid_database_name
 
 def search_skus_and_unique_ids(sku_number):
-    # We all grepping all database files for 
+    database_list = list()
     exclude_db_names = ['user-data.db', 'product_information_database.db']
-    database = os.listdir('datahub')
-    for ex_db in exclude_db_names:
-        try:
-            database.remove(ex_db)
-        except ValueError:
-            pass
-    
-    for database_name in database:
+    for database_name in os.listdir('datahub/'):
         if database_name.endswith('.db'):
-            with sqlite3.connect('datahub/' + database_name) as connection:
+            if database_name in exclude_db_names:
+                pass
+            elif database_name not in exclude_db_names:
+                database_list.append(database_name)
+
+    for database in database_list:
+        with sqlite3.connect('datahub/' + database_name) as connection:
                 cursor = connection.cursor()
                 table_names = cursor.execute(""" SELECT name from sqlite_master where type='table'; """)
-                results = table_names.fetchall()
-                for table in results:
+                result = table_names.fetchall()
+                for table in result:
                     table_name = table[0]
                     unique_id_query = cursor.execute(f""" SELECT SKU, UNIQUE_CODE, LOCATION from {table[0]} where SKU={sku_number} """)
                     unique_ids = unique_id_query.fetchall()
-                    return unique_ids  
+                    print(unique_ids)
+                    return unique_ids
+
+search_skus_and_unique_ids(sku_number='10034')
 
 def sku_search(sku_number):
     location_list = []
