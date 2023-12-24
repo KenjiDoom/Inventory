@@ -337,7 +337,9 @@ def validate_table_name(table_name=None, database_file_name=None):
 
 def search_skus_and_unique_ids(sku_number):
     database_list = list()
+    unique_id_list = list()
     exclude_db_names = ['user-data.db', 'product_information_database.db']
+    
     for database_name in os.listdir('datahub/'):
         if database_name.endswith('.db'):
             if database_name in exclude_db_names:
@@ -346,7 +348,8 @@ def search_skus_and_unique_ids(sku_number):
                 database_list.append(database_name)
 
     for database in database_list:
-        with sqlite3.connect('datahub/' + database_name) as connection:
+        with sqlite3.connect('datahub/' + str(database)) as connection:
+                print(str(database))
                 cursor = connection.cursor()
                 table_names = cursor.execute(""" SELECT name from sqlite_master where type='table'; """)
                 result = table_names.fetchall()
@@ -354,10 +357,16 @@ def search_skus_and_unique_ids(sku_number):
                     table_name = table[0]
                     unique_id_query = cursor.execute(f""" SELECT SKU, UNIQUE_CODE, LOCATION from {table[0]} where SKU={sku_number} """)
                     unique_ids = unique_id_query.fetchall()
-                    print(unique_ids)
-                    return unique_ids
+                    if not unique_ids:
+                        pass
+                    else:
+                        print(len(unique_ids))
+                        for i in range(len(unique_ids)):
+                            unique_id_list.append(unique_ids[i])
 
-search_skus_and_unique_ids(sku_number='10034')
+    return unique_id_list
+
+search_skus_and_unique_ids(sku_number='68896')
 
 def sku_search(sku_number):
     location_list = []
