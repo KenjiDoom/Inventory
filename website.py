@@ -80,12 +80,22 @@ def labelpro():
                 dialog_box = request.form['item_name']
                 comma_value = dialog_box.find(',')
                 if dialog_box.find(',') < 0:
-                    # Generate specific qr tag
-                    print('Item tag now scanned!')
-                    item = dialog_box[6:16]
-                    data = show_scan_results_for_item(unique_code=item)
-                    generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[6], database_file_name=data[7])
-                    return render_template('label.html', successful_message='Successfully generated ' + str(data[0]))
+                    try:
+                        # Generate specific qr tag
+                        print('Item tag now scanned!')
+                        item = dialog_box[6:16]
+                        data = show_scan_results_for_item(unique_code=item)
+                        generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[6], database_file_name=data[7])
+                        return render_template('label.html', successful_message='Successfully generated ' + str(data[0]))
+                    except TypeError:
+                        item = int(dialog_box)
+                        if isinstance(item, int) == True:
+                            item = str(dialog_box)
+                            if len(item) == 10:
+                                data = show_scan_results_for_item(unique_code=item)
+                                generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[6], database_file_name=data[7])
+                                return render_template('label.html', successful_message='Successfully generated ' + str(data[3]))
+
                 elif str(dialog_box[:comma_value]) == 'sales_floor.db':
                     # Generate sales based on pog name.
                     after_sales_value = dialog_box[comma_value + 2:]
@@ -108,11 +118,17 @@ def labelpro():
                     for i in data:
                         generate_all_qr_codes_database(database='stockroom_floor.db', description=str(i))
                     return render_template('label.html', successful_message='Successfully generated ' + str(pog_name))
-
+                
         except TypeError as e:
             print(e)
             return render_template('label.html', error_message='Something went wrong...')
         except IndexError as e:
+            print(e)
+            return render_template('label.html', error_message='Something went wrong...')
+        except NameError as e:
+            print(e)
+            return render_template('label.html', error_message='Something went wrong...')
+        except ValueError as e:
             print(e)
             return render_template('label.html', error_message='Something went wrong...')
 
