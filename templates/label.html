@@ -42,6 +42,10 @@
             font-size: 20px;
             color: red;
         }
+        #successful_message {
+            font-size: 20px;
+            color: green;
+        }
     </style>
 </head>
 <body>
@@ -52,11 +56,19 @@
         
         <!-- Input here-->
         <input type="text" id="item_name" name="item_name" placeholder="Item/Inventory...">
+        
+        {% if successful_message %}
+        <div id="successful_message">
+            {{ successful_message }}
+        </div>
+        {% endif %}
+
         {% if error_message %}
         <div id="error_message">
             {{ error_message }}
         </div>
         {% endif %}
+    
     </form>
     </div>  
 </body>

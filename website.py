@@ -84,9 +84,8 @@ def labelpro():
                     print('Item tag now scanned!')
                     item = dialog_box[6:16]
                     data = show_scan_results_for_item(unique_code=item)
-                    print(data)
                     generate_qr_codes_for_sku(sku=data[0], unique_code=data[3], table_name=data[6], database_file_name=data[7])
-
+                    return render_template('label.html', successful_message='Successfully generated ' + str(data[0]))
                 elif str(dialog_box[:comma_value]) == 'sales_floor.db':
                     # Generate sales based on pog name.
                     after_sales_value = dialog_box[comma_value + 2:]
@@ -97,6 +96,7 @@ def labelpro():
                     data = generate_specfic_pog_tag(pog_data=str(pog_name), sales_floor='True')
                     for i in data:
                         generate_all_qr_codes_database(database='sales_floor.db', description=str(i))
+                    return render_template('label.html', successful_message='Successfully generated ' + str(pog_name))
                 elif str(dialog_box[:comma_value]) == 'stockroom_floor.db':
                     # Generate stockroom based on pog name.
                     after_stockroom_value = dialog_box[comma_value + 2:]
@@ -107,6 +107,8 @@ def labelpro():
                     data = generate_specfic_pog_tag(pog_data=str(pog_name), stockroom_floor='True')
                     for i in data:
                         generate_all_qr_codes_database(database='stockroom_floor.db', description=str(i))
+                    return render_template('label.html', successful_message='Successfully generated ' + str(pog_name))
+
         except TypeError as e:
             print(e)
             return render_template('label.html', error_message='Something went wrong...')
