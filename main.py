@@ -349,7 +349,6 @@ def search_skus_and_unique_ids(sku_number):
 
     for database in database_list:
         with sqlite3.connect('datahub/' + str(database)) as connection:
-                print(str(database))
                 cursor = connection.cursor()
                 table_names = cursor.execute(""" SELECT name from sqlite_master where type='table'; """)
                 result = table_names.fetchall()
@@ -365,8 +364,6 @@ def search_skus_and_unique_ids(sku_number):
                             unique_id_list.append(unique_ids[i])
 
     return unique_id_list
-
-search_skus_and_unique_ids(sku_number='68896')
 
 def sku_search(sku_number):
     location_list = []
@@ -442,7 +439,8 @@ def generate_specfic_pog_tag(pog_data, sales_floor=None, stockroom_floor=None):
     with open('datahub/pog_data.json') as f:
         data = json.loads(f.read())
     
-    pog_names = ['lights', 'drilling', 'screwdrivers', '22', '27', '33']
+    # Caps senstive when inputting pog names
+    pog_names = ['Lights', 'Drilling', 'Screwdrivers', '22', '27', '33']
     
     if pog_data in pog_names:
         if sales_floor != None:
