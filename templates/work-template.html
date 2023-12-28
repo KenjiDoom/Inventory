@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work report</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fff; /* white */
+            color: #000; /* black */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #container {
+            text-align: center;
+            display: flex;
+            flex-direction: row; /* Items will be placed horizontally */
+            align-items: center;
+            justify-content: center;
+        }
+        
+        img {
+            max-width: 20%; /* 50% of the container width */
+            margin-bottom: 10px;
+        }
+
+        p{
+            margin-bottom: 5;
+            font-size: 20px;
+        }
+        
+        .additional-text {
+            font-size: 16px; /* Font size for the additional text */
+            margin-top: 5px; /* Top margin for separation */
+        }
+
+        input {
+            padding: 12px; /* 1.5x smaller */
+            margin-bottom: 10px;
+            border: 1px solid #000; /* black */
+            color: #000; /* black */
+            background-color: #fff; /* white */
+            font-size: 15px; /* 1.5x smaller font size */
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        button {
+            padding: 22.5px; /* 1.5x smaller */
+            margin: 0 5px;
+            border: 1px solid #000; /* black */
+            color: #fff; /* white */
+            cursor: pointer;
+            font-size: 15px; /* 1.5x smaller font size */
+        }
+
+        #checkBtn {
+            background-color: #ff0000; /* green */
+        }
+
+        #crossBtn {
+            background-color: #00ff00; /* red */
+        }
+
+        /* Add this style to color the emojis black */
+        button::before {
+            color: #000; /* black */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <img src="head.png" atl="Head Image">
+        <p>
+            Description:
+        </p>
+    </div>
+    <p class="additional-text">This is an additional line of text.</p>
+    <input type="number" id="inputBox" placeholder="Enter something...">
+    <br>
+    <div class="button-container">
+        <button id="crossBtn" onclick="crossFunction()">✔</button>
+        <button id="checkBtn" onclick="checkFunction()">❌</button>
+    </div>
+
+    <script>
+        function checkFunction() {
+            // Add your logic for the check mark button here
+            // X marked will indicate "ZERO" items where pulled because that item was not found.
+            alert('X mark clicked!');
+        }
+
+        function crossFunction() {
+            // Add your logic for the X button here
+            alert('Check mark clicked!');
+        }
+    </script>
+</body>
+
+</html>
