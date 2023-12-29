@@ -1,68 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work report</title>
+    <title>Inventory Data Entry</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #fff; /* white */
-            color: #000; /* black */
+            background-color: #fff;
+            color: #000;
+            font-family: Arial, sans-serif;
+            text-align: center;
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
         }
 
-        #container {
-            text-align: center;
-            display: flex;
-            flex-direction: row; /* Items will be placed horizontally */
-            align-items: center;
-            justify-content: center;
+        h1 {
+            color: #000;
         }
-        
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #000;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 350px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            width: 90%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
         img {
-            max-width: 20%; /* 50% of the container width */
-            margin-bottom: 10px;
+            max-width: 50%;  
         }
-
-        p{
-            margin-bottom: 5;
-            font-size: 20px;
-        }
-        
-        .additional-text {
-            font-size: 16px; /* Font size for the additional text */
-            margin-top: 5px; /* Top margin for separation */
-        }
-
-        input {
-            padding: 12px; /* 1.5x smaller */
-            margin-bottom: 10px;
-            border: 1px solid #000; /* black */
-            color: #000; /* black */
-            background-color: #fff; /* white */
-            font-size: 15px; /* 1.5x smaller font size */
-        }
-        
         .button-container {
             display: flex;
             justify-content: center;
         }
 
         button {
-            padding: 22.5px; /* 1.5x smaller */
-            margin: 0 5px;
+            margin: 0 7px;
             border: 1px solid #000; /* black */
             color: #fff; /* white */
             cursor: pointer;
-            font-size: 15px; /* 1.5x smaller font size */
+            font-size: 35px; /* 1.5x smaller font size */
         }
 
         #checkBtn {
@@ -73,40 +66,33 @@
             background-color: #00ff00; /* red */
         }
 
+        #rightArrow {
+            background-color:  #2c2c2c;
+        }
+        #leftArrow {
+            background-color: #2c2c2c;
+        }
+
         /* Add this style to color the emojis black */
         button::before {
             color: #000; /* black */
         }
     </style>
 </head>
-
 <body>
-    <div id="container">
+    <form method="POST" id="inventoryForm">
+        <label for="sku_number">Sku:</label> 
         <img src="head.png" atl="Head Image">
-        <p>
-            Description:
-        </p>
-    </div>
-    <p class="additional-text">This is an additional line of text.</p>
-    <input type="number" id="inputBox" placeholder="Enter something...">
-    <br>
-    <div class="button-container">
-        <button id="crossBtn" onclick="crossFunction()">✔</button>
-        <button id="checkBtn" onclick="checkFunction()">❌</button>
-    </div>
-
-    <script>
-        function checkFunction() {
-            // Add your logic for the check mark button here
-            // X marked will indicate "ZERO" items where pulled because that item was not found.
-            alert('X mark clicked!');
-        }
-
-        function crossFunction() {
-            // Add your logic for the X button here
-            alert('Check mark clicked!');
-        }
-    </script>
+        <label for="Capcity">Capcity:</label> 
+        <label for="OH">OH:</label>
+        <label for="restock">Restock QTY:</label>   
+        <br>
+        <div class="button-container">
+            <button id="leftArrow">⬅️</button>
+            <button id="crossBtn">✔</button>
+            <button id="checkBtn">X</button>
+            <button id="rightArrow">➡️</button>
+        </div>
+    </form>
 </body>
-
 </html>
