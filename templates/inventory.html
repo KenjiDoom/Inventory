@@ -77,8 +77,8 @@
         <div class="menu-container">
             <button>Inventory Report</button>
             <div class="submenu">
-                <button onclick="generateReport('Work-report')">Work-report Report</button>
                 <button onclick="generateReport('Summary')">Summary Report</button>
+                <button onclick="generateReport('Work Report')">Work Report</button>
             </div>
         </div>
         <button onclick="sku_search()">SKU Search</button>
@@ -104,7 +104,7 @@
                 if (reportType == 'Summary'){
                     window.open('report_summary', '_self');
                 }
-                if (reportType == 'work_report'){
+                if (reportType == 'Work Report'){
                     window.open('work_report', '_self');
                 }
             }
