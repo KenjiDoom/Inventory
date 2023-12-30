@@ -187,6 +187,7 @@ def report_summary():
 
     return render_template('report_summary.html', data=results)
 
+
 @app.route('/IDSearch/<sku>')
 def id_search(sku):
     unique_ids_data = search_skus_and_unique_ids(sku)
@@ -194,7 +195,11 @@ def id_search(sku):
 
 @app.route('/work_report', methods=['GET', 'POST'])
 def work_report():
-    return redner_template('moving_item.html')
+    # Sku number
+    # OH:
+    # Restock Qty
+    # Capacity amount
+    return render_template('work-template.html')
 
 @app.route('/save_replen', methods=['POST'])
 def save_replen():
