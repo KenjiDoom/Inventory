@@ -101,7 +101,7 @@
     </style>
 </head>
 <body>
-    <form method="POST" id="inventoryForm">
+    <form action='working_replen_button_clicks' method="POST" id="inventoryForm">
         <label for="sku_number">Sku:</label> 
         <img src="head.png" atl="Head Image">
         <label for="Capcity">Capcity:</label> 
@@ -109,16 +109,16 @@
         <label for="restock">Restock QTY:</label>   
         <br>
         <div class="button-container">
-            <button id="leftArrow">⬅️
+            <button name="variable_name" value="Decrease_lefttarrow" id="leftArrow">⬅️
                 <span class="tooltip">Previous item</span>
             </button>
-            <button id="crossBtn">✔
+            <button name="variable_name" value="Item_found" id="crossBtn">✔
                 <span class="tooltip">Item found</span>
             </button>
-            <button id="checkBtn">X
+            <button name="variable_name" value="Item_Not_Found" id="checkBtn">X
                 <span class="tooltip">Item not found</span>
             </button>
-            <button id="rightArrow">➡️
+            <button name="variable_name" value="Increase_rightArrow" id="rightArrow">➡️
                 <span class="tooltip">Next item</span>
             </button>
         </div>
