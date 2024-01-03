@@ -46,6 +46,22 @@
             justify-content: center;
             align-items: center;
         }
+        #results_button{
+            margin: 0 12px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            color: #333;
+            font-size: 1em;
+            padding: 5px 10px;
+        }
+        #work_button{
+            margin: 0 12px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            color: #333;
+            font-size: 1em;
+            padding: 5px 10px;
+        }
     </style>
 
 </head>
@@ -54,10 +70,10 @@
         <h1>Replen Summary</h1>
         <div class="button-menu">
             <form action="/save_replen" method="post"> 
-                <button type="submit">Save Results </button>
+                <button id="results_button" type="submit">Save Results </button>
             </form>
             <form action="/save_qty_restock" method="post">
-                <button type="submit">Work report </button>
+                <button id='work_button' type="submit">Work report </button>
             </form>
         </div>
     </header>
