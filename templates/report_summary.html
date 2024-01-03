@@ -40,15 +40,26 @@
             background-color: #333;
             color: #fff;
         }
+
+        .button-menu{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 
 </head>
 <body>
     <header>
         <h1>Replen Summary</h1>
-        <form action="/save_replen" method="post"> 
-            <button type="submit">Save Results </button>
-        </form>
+        <div class="button-menu">
+            <form action="/save_replen" method="post"> 
+                <button type="submit">Save Results </button>
+            </form>
+            <form action="/save_qty_restock" method="post">
+                <button type="submit">Work report </button>
+            </form>
+        </div>
     </header>
     
     <div class="container">
