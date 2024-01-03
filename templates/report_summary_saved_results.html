@@ -40,7 +40,32 @@
             background-color: #333;
             color: #fff;
         }
-        #saved_message {
+
+        .button-menu{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #results_button{
+            margin: 0 12px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            color: #333;
+            font-size: 1em;
+            padding: 5px 10px;
+        }
+        
+        #work_button{
+            margin: 0 12px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            color: #333;
+            font-size: 1em;
+            padding: 5px 10px;
+        }
+
+        #popup_message {
             font-size: 30px;
             color: rgb(0, 255, 0);
         }
@@ -50,14 +75,56 @@
 <body>
     <header>
         <h1>Replen Summary</h1>
-        <form action="/save_replen" method="post"> 
-            <button type="submit" disabled>Save Results </button>
-        </form>
-        {% if saved_message %}
-        <div id="saved_message">
-            {{ saved_message }}
+        <div class="button-menu">
+            <form action="/save_replen" method="post"> 
+                <button id="results_button" type="submit" disabled hidden >Save Results </button>
+            </form>
+            
+            <form action="/save_qty_restock" method="post">
+                <button id='work_button' type="submit">Work report </button>
+            </form>
+        </div>
+        {% if popup_message %}
+        <div id="popup_message">
+            <label> {{ popup_message }} </label>
         </div>
         {% endif %}
     </header>
+    
+    <div class="container">
+        <h2>Products</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Description</th>
+                    <th>Location</th>
+                    <th>OH</th>
+                    <th>Restock Qty</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in data %}
+                    <tr>
+                        <td class="sku" onclick="openDetailsWindow('{{ product['SKU'] }}')">{{ product['SKU'] }}</td>
+                        <td>{{ product['Description']}}</td>
+                        <td>{{ product['Location']}}</td>
+                        <td>{{ product['OH'] }}</td>
+                        <td>{{ product['Restock QTY'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function openDetailsWindow(sku) {
+            // We can pass the SKU number thru here, to get all the sku numbers and unique id codes
+            var detailsUrl = 'IDSearch/' + sku;
+
+            // Opens a new window with the results of that sku search
+            window.open(detailsUrl, '_blank', 'width=600,height=400');
+        }
+    </script>
 </body>
 </html>
