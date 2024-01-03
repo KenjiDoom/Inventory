@@ -199,7 +199,17 @@ def work_report():
     # OH:
     # Restock Qty
     # Capacity amount
+    # No functionality for button click
     return render_template('work-template.html')
+
+@app.route('/save_qty_restock', methods=['POST'])
+def save_qty():
+    # To-do.
+    # Include date within report.
+
+    re_data = replen_pull_report()
+    save_restock_qty_for_report_page(restock_qty_data=re_data)
+    return work_report()
 
 @app.route('/save_replen', methods=['POST'])
 def save_replen():
@@ -209,6 +219,21 @@ def save_replen():
     save_results(data=all_amount, replen_data=re_data)
 
     return render_template('report_summary_saved_results.html', saved_message='Results have been saved!')
+
+@app.route('/working_replen_button_clicks', methods=['POST'])
+def button_click():
+    variable_value = request.form.get('variable_name')
+    print(variable_value)
+    if variable_value == 'Increase_rightArrow':
+        print('Increasing the count and moving onto the next sku number')
+    elif variable_value == 'Decrease_lefttarrow':
+        print('Decreasing the count and moving backwards')
+    elif variable_value == 'Item_Not_Found':
+        print('Item not found!')
+    elif variable_value == 'Item_found':
+        print('Item found!')
+        
+    return f'The variable value is: {variable_value}'
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
