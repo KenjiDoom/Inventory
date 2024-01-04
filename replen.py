@@ -187,7 +187,7 @@ def save_results(data, replen_data):
     present_data.update(data)
     number_object = json.dumps(present_data, indent=4)
     
-    # Replen json json object
+    # Replen json object
     present_replen = {'Date': day}
     present_replen.update(replen_data)
     replen_object = json.dumps(present_replen, indent=4)
@@ -210,7 +210,19 @@ def save_results(data, replen_data):
     else:
         print("replenished-reports directory not found.")
     
-    print('Updating log.json file')
+    # Saving to log file
     with open('datahub/log.json', 'w') as log:
         log_json_object = json.dumps(present_date_log, indent=4)
         log.write(log_json_object)
+
+def save_restock_qty_for_report_page(restock_qty_data):
+    current_date = date.today()
+    day = str(current_date) 
+    
+    restock_data = {'Date': day}
+    restock_data.update(restock_qty_data)
+    restock_data_json_object = json.dumps(restock_data, indent=4)
+    
+    report_file_name = day + '_qty_report.json'
+    with open('datahub/reports/total_qty_reports/' + str(report_file_name), 'w') as file:
+        file.write(restock_data_json_object)
