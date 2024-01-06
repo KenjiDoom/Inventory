@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 import sqlite3, socket
 from replen import *
 from main import *
+
 app = Flask(__name__)
 
 @app.route("/", methods=['GET', 'POST'])
@@ -193,47 +194,92 @@ def id_search(sku):
     unique_ids_data = search_skus_and_unique_ids(sku)
     return render_template('id_locations.html', unique_numbers=unique_ids_data, sku_number=sku)
 
+@app.route('/save_replen', methods=['POST'])
+def save_replen():
+    # This functions runs when save replen button is clicked.
+    # Clicking save on this function should also save to qty...
+    all_amount = total_amount_warehouse(data_removed_name='backend_warehouse.db')
+    re_data = replen_pull_report()
+    save_results(data=all_amount, replen_data=re_data)
+    save_qty()
+
+    return render_template('report_summary_saved_results.html', popup_message='Results have been saved!')
+
 @app.route('/work_report', methods=['GET', 'POST'])
-def work_report():
-    # Sku number
-    # OH:
-    # Restock Qty
-    # Capacity amount
-    # No functionality for button click
+def work_report(value_number=None):
+    sku_list = ['10034', '68896', '40456']
+    try:
+        if value_number >= len(sku_list):
+            pass
+        elif value_number < 0:
+            print('Negative number detected!')
+        else:
+            print(sku_list[value_number]) 
+    except IndexError:
+        pass
+
     return render_template('work-template.html')
 
 @app.route('/save_qty_restock', methods=['POST'])
 def save_qty():
-    # To-do.
-    # Include date within report.
-
     re_data = replen_pull_report()
     save_restock_qty_for_report_page(restock_qty_data=re_data)
-    return work_report()
+    qry_data = rading_qty_content()
+    return work_report(value_number=None)
 
-@app.route('/save_replen', methods=['POST'])
-def save_replen():
-    # This functions runs when save replen button is clicked.
-    all_amount = total_amount_warehouse(data_removed_name='backend_warehouse.db')
-    re_data = replen_pull_report()
-    save_results(data=all_amount, replen_data=re_data)
+def rading_qty_content():
+    current_date = date.today()
+    day = str(current_date)
+    with open('datahub/reports/total_qty_reports/' + str(day) + '_qty_report.json', 'r') as file:
+        data = json.loads(file.read())
 
-    return render_template('report_summary_saved_results.html', saved_message='Results have been saved!')
+    sku_number_list = []
+
+    for sku_numbers, value in data.items():
+        if sku_numbers == 'Date':
+            pass
+        else:
+            sku_number_list.append(sku_numbers)
+
+    return sku_number_list
+
+# This class is a little random here
+class counter:
+    def __init__(self):
+        # 1. How can I prevent this from going to negative numbers
+        # 2. How can I prevent this from going over-board, adding more number's then it acutally does.
+        self.value = 0
+        self.sku_count = 0
+        
+    def count_sku_list(self, sku_list):
+        self.sku_count = len(sku_list)
+        print(self.sku_count)
+
+    def increment(self, incremnet_number):
+        self.value += 1
+        return self.value
+    
+    def decrement(self, decremnet_number):
+        self.value -= 1
+        return self.value
+
+counter_count = counter()
 
 @app.route('/working_replen_button_clicks', methods=['POST'])
 def button_click():
+    sku_list = rading_qty_content()
     variable_value = request.form.get('variable_name')
-    print(variable_value)
     if variable_value == 'Increase_rightArrow':
-        print('Increasing the count and moving onto the next sku number')
+        value = counter_count.increment(1)
+        sku_count = counter_count.count_sku_list(sku_list)
     elif variable_value == 'Decrease_lefttarrow':
-        print('Decreasing the count and moving backwards')
+        value = counter_count.decrement(1)
     elif variable_value == 'Item_Not_Found':
         print('Item not found!')
     elif variable_value == 'Item_found':
         print('Item found!')
-        
-    return f'The variable value is: {variable_value}'
+
+    return work_report(value_number=value)
 
 if __name__ == "__main__":
     IP = socket.gethostbyname(socket.gethostname())
