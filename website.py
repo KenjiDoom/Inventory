@@ -206,24 +206,16 @@ def save_replen():
     return render_template('report_summary_saved_results.html', popup_message='Results have been saved!')
 
 @app.route('/work_report', methods=['GET', 'POST'])
-def work_report(value_number=None):
+def work_report(value_number):
     sku_list = ['10034', '68896', '40456']
-
+    print(value_number)
     try:
-        if value_number < 0:
-            print('Negative number detected!')
-        elif value_number == None:
-            pass
-        else:
-            sku = sku_list[value_number]
-            data = sku_search(sku_number=str(sku))
-            OH = sku_total_amount(sku_number=str(sku))
-            image_link = search_for_sku_image_file(sku=sku)
-            sku_restock_qty = reading_qty_content(sku_number=str(sku))
-            results = [(sku, data[0][3], OH, str(sku_restock_qty), image_link)]
-            
-            print(results)
-
+        sku = sku_list[value_number]
+        data = sku_search(sku_number=str(sku))
+        OH = sku_total_amount(sku_number=str(sku))
+        image_link = search_for_sku_image_file(sku=sku)
+        sku_restock_qty = reading_qty_content(sku_number=str(sku))
+        results = [(sku, data[0][3], OH, str(sku_restock_qty), image_link)]
     except IndexError as e:
         print(e)
     except TypeError as e:
@@ -237,24 +229,25 @@ def save_qty():
     save_restock_qty_for_report_page(restock_qty_data=re_data)
     return work_report(value_number=0)
 
-# This class is a little random here
 class counter:
-    def __init__(self):
-        # 1. How can I prevent this from going to negative numbers
-        # 2. How can I prevent this from going over-board, adding more number's then it acutally does.
-        
+    def __init__(self):       
         self.value = 0
-        
-        # Left off here
-        # Keep track of increment numbers and make sure it doesn't go overboard...
-        self.sku_count = 3
+        self.sku_count = 2
 
     def increment(self, incremnet_number):
-        self.value += 1
+        if self.value >= self.sku_count:
+            pass
+        else:
+            self.value += 1
+        
         return self.value
     
     def decrement(self, decremnet_number):
-        self.value -= 1
+        if self.value <= 0:
+            self.value = 0
+        else:
+            self.value -= 1
+        
         return self.value
 
 counter_count = counter()
