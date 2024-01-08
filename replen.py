@@ -237,3 +237,37 @@ def reading_qty_content(sku_number):
         data = json.loads(file.read())
 
     return data[str(sku_number)]
+
+
+def found_or_not(status, sku_number):
+    # Used for indicating of a sku number was found or not.
+    current_date = date.today()
+    day = str(current_date)
+    
+    def write_to_file(sku_number, status):
+        # Should have a brand new file wit all the sku numbers and a value of N/A 
+        # Open json file
+        # Read json file
+        # Update key value
+        # Save key value
+        data = {str(sku_number): status}
+    
+        # with open('datahub/reports/status_data.json', 'w') as f:
+        #     json.dump(data, f)
+
+        with open('datahub/reports/status_data.json', 'w+') as f:
+            file_data = json.loads(f.read())
+            file_data[str(sku_number)] = str(status)
+            print(file_data)
+            # json.dump(file_data, f)
+            
+            
+
+    if status == 'not_found':
+        print('Typing sku as not found....')
+        write_to_file(status='not_found', sku_number=sku_number)
+    elif status == 'found':
+        print('Typing sku as found!')
+        write_to_file(status=status, sku_number=sku_number)
+
+found_or_not(status='not_found', sku_number='10034')
