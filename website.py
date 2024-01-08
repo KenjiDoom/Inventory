@@ -210,9 +210,7 @@ def work_report(value_number=None):
     sku_list = ['10034', '68896', '40456']
 
     try:
-        if value_number >= 3:
-            pass
-        elif value_number < 0:
+        if value_number < 0:
             print('Negative number detected!')
         elif value_number == None:
             pass
@@ -230,25 +228,26 @@ def work_report(value_number=None):
         print(e)
     except TypeError as e:
         print(e)
-
+    
     return render_template('work-template.html', data=results)
 
 @app.route('/save_qty_restock', methods=['POST'])
 def save_qty():
     re_data = replen_pull_report()
     save_restock_qty_for_report_page(restock_qty_data=re_data)
-    return work_report(value_number=None)
+    return work_report(value_number=0)
 
 # This class is a little random here
 class counter:
     def __init__(self):
         # 1. How can I prevent this from going to negative numbers
         # 2. How can I prevent this from going over-board, adding more number's then it acutally does.
+        
         self.value = 0
-        self.sku_count = 0
-
-    def count_sku_list(self, sku_list):
-        self.sku_count = len(sku_list)
+        
+        # Left off here
+        # Keep track of increment numbers and make sure it doesn't go overboard...
+        self.sku_count = 3
 
     def increment(self, incremnet_number):
         self.value += 1
@@ -262,6 +261,7 @@ counter_count = counter()
 
 @app.route('/working_replen_button_clicks', methods=['POST'])
 def button_click():
+    # Keep track of skus not found...
     variable_value = request.form.get('variable_name')
     if variable_value == 'Increase_rightArrow':
         value = counter_count.increment(1)
