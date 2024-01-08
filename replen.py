@@ -226,3 +226,14 @@ def save_restock_qty_for_report_page(restock_qty_data):
     report_file_name = day + '_qty_report.json'
     with open('datahub/reports/total_qty_reports/' + str(report_file_name), 'w') as file:
         file.write(restock_data_json_object)
+
+
+def reading_qty_content(sku_number):
+    print('Accessing ' + str(sku_number))
+    # Reading restock qty from log file
+    current_date = date.today()
+    day = str(current_date)
+    with open('datahub/reports/total_qty_reports/' + str(day) + '_qty_report.json', 'r') as file:
+        data = json.loads(file.read())
+
+    return data[str(sku_number)]
