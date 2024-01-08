@@ -102,12 +102,14 @@
 </head>
 <body>
     <form action='working_replen_button_clicks' method="POST" id="inventoryForm">
-        <label for="sku_number">Sku:</label> 
-        <img src="head.png" atl="Head Image">
-        <label for="Capcity">Capcity:</label> 
-        <label for="OH">OH:</label>
-        <label for="restock">Restock QTY:</label>   
+        {% for product in data %}
+        <label for="sku_number">Sku:{{ product[0] }}</label> 
+        <img src="{{ product[4] }}" atl="Head Image">
+        <label for="Capcity">Capcity: {{ product[1] }} </label> 
+        <label for="OH">OH: {{ product[2] }} </label>
+        <label for="restock">Restock QTY: {{ product[3] }} </label>   
         <br>
+        {% endfor %}
         <div class="button-container">
             <button name="variable_name" value="Decrease_lefttarrow" id="leftArrow">⬅️
                 <span class="tooltip">Previous item</span>
