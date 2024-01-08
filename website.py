@@ -231,7 +231,7 @@ def work_report(value_number=None):
     except TypeError as e:
         print(e)
 
-    return render_template('work-template.html')
+    return render_template('work-template.html', data=results)
 
 @app.route('/save_qty_restock', methods=['POST'])
 def save_qty():
