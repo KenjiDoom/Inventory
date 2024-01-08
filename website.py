@@ -208,15 +208,28 @@ def save_replen():
 @app.route('/work_report', methods=['GET', 'POST'])
 def work_report(value_number=None):
     sku_list = ['10034', '68896', '40456']
+
     try:
-        if value_number >= len(sku_list):
+        if value_number >= 3:
             pass
         elif value_number < 0:
             print('Negative number detected!')
+        elif value_number == None:
+            pass
         else:
-            print(sku_list[value_number]) 
-    except IndexError:
-        pass
+            sku = sku_list[value_number]
+            data = sku_search(sku_number=str(sku))
+            OH = sku_total_amount(sku_number=str(sku))
+            image_link = search_for_sku_image_file(sku=sku)
+            sku_restock_qty = reading_qty_content(sku_number=str(sku))
+            results = [(sku, data[0][3], OH, str(sku_restock_qty), image_link)]
+            
+            print(results)
+
+    except IndexError as e:
+        print(e)
+    except TypeError as e:
+        print(e)
 
     return render_template('work-template.html')
 
@@ -224,24 +237,7 @@ def work_report(value_number=None):
 def save_qty():
     re_data = replen_pull_report()
     save_restock_qty_for_report_page(restock_qty_data=re_data)
-    qry_data = rading_qty_content()
     return work_report(value_number=None)
-
-def rading_qty_content():
-    current_date = date.today()
-    day = str(current_date)
-    with open('datahub/reports/total_qty_reports/' + str(day) + '_qty_report.json', 'r') as file:
-        data = json.loads(file.read())
-
-    sku_number_list = []
-
-    for sku_numbers, value in data.items():
-        if sku_numbers == 'Date':
-            pass
-        else:
-            sku_number_list.append(sku_numbers)
-
-    return sku_number_list
 
 # This class is a little random here
 class counter:
@@ -250,10 +246,9 @@ class counter:
         # 2. How can I prevent this from going over-board, adding more number's then it acutally does.
         self.value = 0
         self.sku_count = 0
-        
+
     def count_sku_list(self, sku_list):
         self.sku_count = len(sku_list)
-        print(self.sku_count)
 
     def increment(self, incremnet_number):
         self.value += 1
@@ -267,11 +262,9 @@ counter_count = counter()
 
 @app.route('/working_replen_button_clicks', methods=['POST'])
 def button_click():
-    sku_list = rading_qty_content()
     variable_value = request.form.get('variable_name')
     if variable_value == 'Increase_rightArrow':
         value = counter_count.increment(1)
-        sku_count = counter_count.count_sku_list(sku_list)
     elif variable_value == 'Decrease_lefttarrow':
         value = counter_count.decrement(1)
     elif variable_value == 'Item_Not_Found':
